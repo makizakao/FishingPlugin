@@ -1,6 +1,7 @@
 package org.hark7.fishingPlugin;
 
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +10,15 @@ public class FishItems {
     public final List<CustomFish> fishList = new ArrayList<>();       // 釣り可能な魚のリスト
 
     public void initializeFishList() {
-        // Scrap
+        // Scrap fish
+        addFish(Material.LILY_PAD, CustomFish.Rarity.SCRAP);
+        addFish(Material.BOWL, CustomFish.Rarity.SCRAP);
+        addFish(Material.STICK, CustomFish.Rarity.SCRAP);
+        addFish(Material.STRING, CustomFish.Rarity.SCRAP);
+        addFish(Material.ROTTEN_FLESH, CustomFish.Rarity.SCRAP);
+        addFish(Material.BONE, CustomFish.Rarity.SCRAP);
+        addFish(Material.LEATHER, CustomFish.Rarity.SCRAP);
+        addFish(Material.INK_SAC, CustomFish.Rarity.SCRAP);
         // Common fish (40 types)
         addFish("コイ", "淡水の定番魚", Material.COD, CustomFish.Rarity.COMMON);
         addFish("フナ", "日本の川でよく見られる魚", Material.COD, CustomFish.Rarity.COMMON);

@@ -39,7 +39,13 @@ public class CustomFish {
     }
 
     public CustomFish(Material material, Rarity rarity, int damage, EnchantmentValue... enchantments) {
-        this.name = material.name();
+        var item = new ItemStack(material);
+        var meta = item.getItemMeta();
+        if(meta != null && meta.hasDisplayName()) {
+            this.name = item.getItemMeta().getDisplayName();
+        } else {
+            this.name = material.name();
+        }
         this.material = material;
         this.description = "";
         this.rarity = rarity;
@@ -53,7 +59,13 @@ public class CustomFish {
      * @param rarity 魚のレアリティ
      */
     public CustomFish(Material material, Rarity rarity, EnchantmentValue... enchantments) {
-        this.name = material.name();
+        var item = new ItemStack(material);
+        var meta = item.getItemMeta();
+        if(meta != null && meta.hasDisplayName()) {
+            this.name = item.getItemMeta().getDisplayName();
+        } else {
+            this.name = material.name();
+        }
         this.material = material;
         this.description = "";
         this.rarity = rarity;
