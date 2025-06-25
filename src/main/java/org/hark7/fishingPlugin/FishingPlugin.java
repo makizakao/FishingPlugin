@@ -18,11 +18,16 @@ public class FishingPlugin extends JavaPlugin {
     public final Map<UUID, Integer> fishingExp = new HashMap<>();     // Playerごとの釣り経験値
     public final FishItems fishItems = new FishItems();
 
+    public static FishingPlugin getInstance() {
+        return JavaPlugin.getPlugin(FishingPlugin.class);
+    }
+
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new FishListener(this), this);
         loadConfig();
         fishItems.initializeFishList();
+        Recipes.register();
         // コマンドの追加
         Optional.ofNullable(getCommand("fishstats"))
                 .ifPresent(c -> c.setExecutor(new FishStatsCommand(this)));

@@ -68,7 +68,7 @@ public class FishItems {
         addFish("カニ", "甲殻類の代表", Material.COD, CustomFish.Rarity.RARE);
         addFish("ホタテ", "貝類の中でも人気", Material.COD, CustomFish.Rarity.RARE);
         addFish("アワビ", "高級食材として知られる", Material.COD, CustomFish.Rarity.RARE);
-        addFish("ウニ", "海のフォアグラと呼ばれる", Material.SEA_PICKLE, CustomFish.Rarity.RARE);
+        addFish("ウニ", "海のフォアグラと呼ばれる", Material.COD, CustomFish.Rarity.RARE);
         addFish("フグ", "毒を持つ高級魚", Material.PUFFERFISH, CustomFish.Rarity.RARE);
         addFish("アンコウ", "深海に住む奇妙な魚", Material.COD, CustomFish.Rarity.RARE);
         addFish("ノコギリザメ", "特徴的な吻を持つサメ", Material.COD, CustomFish.Rarity.RARE);
