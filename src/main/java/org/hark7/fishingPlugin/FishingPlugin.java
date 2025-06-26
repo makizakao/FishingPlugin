@@ -10,6 +10,7 @@ import org.hark7.fishingPlugin.command.FishStatsCommand;
 import org.hark7.fishingPlugin.command.FishTopCommand;
 import org.hark7.fishingPlugin.command.UpgradePoleCommand;
 import org.hark7.fishingPlugin.listener.FishListener;
+import org.hark7.fishingPlugin.listener.VillagerAcquireTradeListener;
 
 import java.util.*;
 
@@ -18,16 +19,17 @@ public class FishingPlugin extends JavaPlugin {
     public final Map<UUID, Integer> fishingExp = new HashMap<>();     // Playerごとの釣り経験値
     public final FishItems fishItems = new FishItems();
 
-    public static FishingPlugin getInstance() {
-        return JavaPlugin.getPlugin(FishingPlugin.class);
-    }
-
+    /**
+     * プラグインの有効化時に呼び出されるメソッド
+     * イベントリスナーの登録、設定ファイルの読み込み、レシピの登録を行います。
+     */
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new FishListener(this), this);
+        getServer().getPluginManager().registerEvents(new VillagerAcquireTradeListener(this), this);
         loadConfig();
         fishItems.initializeFishList();
-        Recipes.register();
+        Recipes.register(this);
         // コマンドの追加
         Optional.ofNullable(getCommand("fishstats"))
                 .ifPresent(c -> c.setExecutor(new FishStatsCommand(this)));
@@ -40,6 +42,10 @@ public class FishingPlugin extends JavaPlugin {
         getLogger().info("FishingPlugin has been enabled!");
     }
 
+    /**
+     * プラグインの無効化時に呼び出されるメソッド
+     * 設定ファイルの保存を行います。
+     */
     @Override
     public void onDisable() {
         saveCustomConfig();

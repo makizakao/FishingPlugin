@@ -19,6 +19,7 @@ public class FishItems {
         addFish(Material.BONE, CustomFish.Rarity.SCRAP);
         addFish(Material.LEATHER, CustomFish.Rarity.SCRAP);
         addFish(Material.INK_SAC, CustomFish.Rarity.SCRAP);
+
         // Common fish (40 types)
         addFish("コイ", "淡水の定番魚", Material.COD, CustomFish.Rarity.COMMON);
         addFish("フナ", "日本の川でよく見られる魚", Material.COD, CustomFish.Rarity.COMMON);
@@ -85,7 +86,7 @@ public class FishItems {
         addFish("リュウグウノツカイ", "深海の不思議な魚", Material.COD, CustomFish.Rarity.EPIC);
         addFish("ラブカ", "原始的な姿の深海ザメ", Material.COD, CustomFish.Rarity.EPIC);
 
-        // Legendary fish (2 types)
+        // Legendary fish (8 types)
         addFish("幻の金色コイ", "伝説の魚", Material.COD, CustomFish.Rarity.LEGENDARY);
         addFish("深海の巨大イカ", "伝説の海獣", Material.COD, CustomFish.Rarity.LEGENDARY);
         addFish(Material.NAME_TAG, CustomFish.Rarity.LEGENDARY);

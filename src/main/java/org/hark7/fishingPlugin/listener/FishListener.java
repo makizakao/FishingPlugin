@@ -15,6 +15,10 @@ import org.hark7.fishingPlugin.CustomFish.EnchantmentValue;
 
 import java.util.*;
 
+/**
+ * プレイヤーが魚を釣り上げた際に呼び出され、ランダムな魚を生成してプレイヤーに通知します。
+ * また、釣り竿のエンチャントによるボーナス経験値も計算します。
+ */
 public class FishListener implements Listener {
     private static final float BASE_LEGENDARY_CHANCE = 0.001F; // 基本のレジェンダリー魚の出現確率
     private static final float BASE_EPIC_CHANCE = 0.01F;      // 基本のエピック魚の出現確率
