@@ -21,10 +21,11 @@ import java.util.*;
  */
 public class FishListener implements Listener {
     private static final float BASE_LEGENDARY_CHANCE = 0.001F; // 基本のレジェンダリー魚の出現確率
-    private static final float BASE_EPIC_CHANCE = 0.01F;      // 基本のエピック魚の出現確率
-    private static final float BASE_RARE_CHANCE = 0.05F;      // 基本のレア魚の出現確率
+    private static final float BASE_EPIC_CHANCE = 0.01F;       // 基本のエピック魚の出現確率
+    private static final float BASE_RARE_CHANCE = 0.05F;       // 基本のレア魚の出現確率
     private static final float BASE_UNCOMMON_CHANCE = 0.2F;    // 基本のアンコモン魚の出現確率
     private static final float BASE_COMMON_CHANCE = 0.85F;     // 基本のコモン魚の出現確率
+    // 釣り竿に付与される可能性のあるエンチャントのリスト
     private final Enchantment[] enchantments = {
             Enchantment.BINDING_CURSE, Enchantment.VANISHING_CURSE, Enchantment.FROST_WALKER, Enchantment.MENDING,
             Enchantment.SOUL_SPEED, Enchantment.SWIFT_SNEAK, Enchantment.WIND_BURST, Enchantment.AQUA_AFFINITY,
@@ -44,6 +45,13 @@ public class FishListener implements Listener {
         this.plugin = plugin;
     }
 
+    /**
+     * プレイヤーが魚を釣り上げた際に呼び出されるイベントハンドラー。
+     * 釣り上げた魚の種類をランダムに決定し、プレイヤーに通知します。
+     * また、釣り竿のエンチャントによるボーナス経験値も計算します。
+     *
+     * @param event PlayerFishEvent イベント
+     */
     @EventHandler
     public void onPlayerFish(PlayerFishEvent event) {
         if (event.getState() == PlayerFishEvent.State.CAUGHT_FISH) {
@@ -60,7 +68,7 @@ public class FishListener implements Listener {
             int bonusExp = calculateBonusExp(player.getInventory().getItemInMainHand());
             int totalExp = baseExp + bonusExp;
 
-            //addExperience(playerUUID, totalExp);
+            plugin.addExperience(playerUUID, totalExp);
             player.sendMessage(ChatColor.YELLOW + "獲得経験値: " + totalExp + " (ボーナス: " + bonusExp + ")");
         }
     }
@@ -119,6 +127,7 @@ public class FishListener implements Listener {
         var selectedFish = fishOfSelectedRarity.get(new Random().nextInt(fishOfSelectedRarity.size()));
         if (selectedFish.material == Material.BOW) selectedFish = getBow(playerLevel);
         else if (selectedFish.material == Material.ENCHANTED_BOOK) selectedFish = getEnchantBook(playerLevel);
+        else if (selectedFish.material == Material.FISHING_ROD) selectedFish = getFishingLod(playerLevel);
         return selectedFish;
     }
 
@@ -175,6 +184,57 @@ public class FishListener implements Listener {
         return new CustomFish(Material.BOW, CustomFish.Rarity.LEGENDARY, damage, enchantments.toArray(new CustomFish.EnchantmentValue[0]));
     }
 
+    /**
+     * プレイヤーのレベルに応じて釣り竿を生成します。
+     * 耐久力、入れ食い、宝釣りのエンチャントがランダムに付与されます。
+     * @param playerLevel　プレイヤーのレベル
+     * return 釣り竿
+     */
+    private CustomFish getFishingLod(int playerLevel) {
+        var rand = new Random();
+        var enchantments = new ArrayList<CustomFish.EnchantmentValue>();
+        var damage = 60;
+        // 耐久力のエンチャントを追加
+        if (playerLevel >= 3 && rand.nextInt(4) == 0) {
+            var level = 1;
+            if (playerLevel > 10) level += rand.nextInt(3);
+            else if (playerLevel > 7) level += rand.nextInt(2);
+            enchantments.add(new CustomFish.EnchantmentValue(Enchantment.UNBREAKING, level));
+        }
+        // 入れ食いのエンチャントを追加
+        if (playerLevel >= 7 && rand.nextInt(4) == 0) {
+            var level = 1;
+            if (playerLevel > 12) level += rand.nextInt(3);
+            else if (playerLevel > 10) level += rand.nextInt(2);
+            enchantments.add(new CustomFish.EnchantmentValue(Enchantment.LURE, level));
+        }
+        // 宝釣りのエンチャントを追加
+        if (playerLevel >= 10 && rand.nextInt(4) == 0) {
+            var level = 1;
+            if (playerLevel > 15) level += rand.nextInt(3);
+            else if (playerLevel > 12) level += rand.nextInt(2);
+            enchantments.add(new CustomFish.EnchantmentValue(Enchantment.LUCK_OF_THE_SEA, level));
+        }
+
+        // 耐久値を設定
+        if (playerLevel >=  3) damage = Math.max(0, damage - rand.nextInt(10));
+        if (playerLevel >=  5) damage = Math.max(0, damage - rand.nextInt(10));
+        if (playerLevel >=  7) damage = Math.max(0, damage - rand.nextInt(10));
+        if (playerLevel >= 10) damage = Math.max(0, damage - rand.nextInt(10));
+        if (playerLevel >= 12) damage = Math.max(0, damage - rand.nextInt(10));
+        if (playerLevel >= 15) damage = Math.max(0, damage - rand.nextInt(10));
+        if (playerLevel >= 18) damage = Math.max(0, damage - rand.nextInt(10));
+        if (playerLevel >= 20) damage = Math.max(0, damage - rand.nextInt(10));
+        return new CustomFish(Material.BOW, CustomFish.Rarity.LEGENDARY, damage, enchantments.toArray(new CustomFish.EnchantmentValue[0]));
+    }
+
+    /**
+     * プレイヤーのレベルに応じてエンチャントされた本を生成します。
+     * エンチャントの種類とレベルはランダムに決定されます。
+     *
+     * @param playerLevel プレイヤーのレベル
+     * @return エンチャントされた本
+     */
     private CustomFish getEnchantBook(int playerLevel) {
         var rand = new Random();
         var enchantment = enchantments[rand.nextInt(enchantments.length)];
