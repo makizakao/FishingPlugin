@@ -126,9 +126,9 @@ public class FishTopCommand implements CommandExecutor {
     }
 
     private void sendUsage(CommandSender sender) {
-        sender.sendMessage(ChatColor.RED + "使用方法: /fishtop <level | count | [Rarity]>");
+        sender.sendMessage(ChatColor.RED + "使用方法: /fishtop <level | total | [Rarity]>");
         sender.sendMessage(ChatColor.YELLOW + "レベル順に表示: /fishtop level");
-        sender.sendMessage(ChatColor.YELLOW + "釣った魚の個数順に表示: /fishtop count");
+        sender.sendMessage(ChatColor.YELLOW + "釣った魚の個数順に表示: /fishtop total");
         sender.sendMessage(ChatColor.YELLOW + "レアリティー順に表示: /fishtop <Rarity>");
     }
 }
