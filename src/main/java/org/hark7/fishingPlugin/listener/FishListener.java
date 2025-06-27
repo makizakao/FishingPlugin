@@ -24,7 +24,7 @@ public class FishListener implements Listener {
     private static final float BASE_EPIC_CHANCE = 0.01F;       // 基本のエピック魚の出現確率
     private static final float BASE_RARE_CHANCE = 0.05F;       // 基本のレア魚の出現確率
     private static final float BASE_UNCOMMON_CHANCE = 0.2F;    // 基本のアンコモン魚の出現確率
-    private static final float BASE_COMMON_CHANCE = 0.85F;     // 基本のコモン魚の出現確率
+    private static final float BASE_COMMON_CHANCE = 0.8F;      // 基本のコモン魚の出現確率
     // 釣り竿に付与される可能性のあるエンチャントのリスト
     private final Enchantment[] enchantments = {
             Enchantment.BINDING_CURSE, Enchantment.VANISHING_CURSE, Enchantment.FROST_WALKER, Enchantment.MENDING,
@@ -69,6 +69,7 @@ public class FishListener implements Listener {
             int totalExp = baseExp + bonusExp;
 
             plugin.addExperience(playerUUID, totalExp);
+            plugin.addCount(playerUUID, caughtFish.rarity);
             player.sendMessage(ChatColor.YELLOW + "獲得経験値: " + totalExp + " (ボーナス: " + bonusExp + ")");
         }
     }
@@ -110,18 +111,12 @@ public class FishListener implements Listener {
      * @return ランダムに選ばれた魚
      */
     private CustomFish getRandomFish(UUID playerUUID, ItemStack fishingRod) {
-        int playerLevel = plugin.fishingLevels.getOrDefault(playerUUID, 1);
+        int playerLevel = plugin.playerDataMap().get(playerUUID).getLevel();
         double rarityBonus = calculateRarityBonus(playerLevel, fishingRod);
         double random = Math.random();
-        CustomFish.Rarity selectedRarity;
-        if (random < (BASE_LEGENDARY_CHANCE + rarityBonus)) selectedRarity = CustomFish.Rarity.LEGENDARY;
-        else if (random < (BASE_EPIC_CHANCE + rarityBonus)) selectedRarity = CustomFish.Rarity.EPIC;
-        else if (random < (BASE_RARE_CHANCE + rarityBonus)) selectedRarity = CustomFish.Rarity.RARE;
-        else if (random < (BASE_UNCOMMON_CHANCE + rarityBonus)) selectedRarity = CustomFish.Rarity.UNCOMMON;
-        else if (random < (BASE_COMMON_CHANCE + rarityBonus)) selectedRarity = CustomFish.Rarity.COMMON;
-        else selectedRarity = CustomFish.Rarity.COMMON;
+        CustomFish.Rarity selectedRarity = getRarity(random, rarityBonus);
 
-        List<CustomFish> fishOfSelectedRarity = plugin.fishItems.fishList.stream()
+        List<CustomFish> fishOfSelectedRarity = plugin.fishList().stream()
                 .filter(fish -> fish.rarity == selectedRarity)
                 .toList();
         var selectedFish = fishOfSelectedRarity.get(new Random().nextInt(fishOfSelectedRarity.size()));
@@ -129,6 +124,17 @@ public class FishListener implements Listener {
         else if (selectedFish.material == Material.ENCHANTED_BOOK) selectedFish = getEnchantBook(playerLevel);
         else if (selectedFish.material == Material.FISHING_ROD) selectedFish = getFishingLod(playerLevel);
         return selectedFish;
+    }
+
+    private static CustomFish.Rarity getRarity(double random, double rarityBonus) {
+        CustomFish.Rarity selectedRarity;
+        if (random < (BASE_LEGENDARY_CHANCE + rarityBonus)) selectedRarity = CustomFish.Rarity.LEGENDARY;
+        else if (random < (BASE_EPIC_CHANCE + rarityBonus)) selectedRarity = CustomFish.Rarity.EPIC;
+        else if (random < (BASE_RARE_CHANCE + rarityBonus)) selectedRarity = CustomFish.Rarity.RARE;
+        else if (random < (BASE_UNCOMMON_CHANCE + rarityBonus)) selectedRarity = CustomFish.Rarity.UNCOMMON;
+        else if (random < (BASE_COMMON_CHANCE + rarityBonus)) selectedRarity = CustomFish.Rarity.COMMON;
+        else selectedRarity = CustomFish.Rarity.COMMON;
+        return selectedRarity;
     }
 
     /**
@@ -215,7 +221,6 @@ public class FishListener implements Listener {
             else if (playerLevel > 12) level += rand.nextInt(2);
             enchantments.add(new CustomFish.EnchantmentValue(Enchantment.LUCK_OF_THE_SEA, level));
         }
-
         // 耐久値を設定
         if (playerLevel >=  3) damage = Math.max(0, damage - rand.nextInt(10));
         if (playerLevel >=  5) damage = Math.max(0, damage - rand.nextInt(10));

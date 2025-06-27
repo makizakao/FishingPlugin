@@ -4,12 +4,10 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
-import org.hark7.fishingPlugin.CustomFish;
 import org.hark7.fishingPlugin.CustomFish.*;
 import org.hark7.fishingPlugin.FishingPlugin;
 
@@ -65,7 +63,7 @@ public class VillagerAcquireTradeListener implements Listener {
         addRecipeToTable(APPRENTICE_RECIPE_TABLE, 16, 0.05f, 5,
                 new ItemStack(Material.COOKED_SALMON),
                 new ItemStack(Material.SALMON, 20), new ItemStack(Material.EMERALD));
-        plugin.fishItems.fishList.stream().filter(i -> i.rarity == Rarity.RARE)
+        plugin.fishList().stream().filter(i -> i.rarity == Rarity.RARE)
                 .forEach(fish -> {
                     var itemStack = fish.createItemStack();
                     itemStack.setAmount(5);
@@ -87,7 +85,7 @@ public class VillagerAcquireTradeListener implements Listener {
             addRecipeToTable(JOURNEYMAN_RECIPE_TABLE, 3, 0.02f, 5,
                     itemStack, new ItemStack(Material.EMERALD, 8 + (level - 1) * 7));
         });
-        plugin.fishItems.fishList.stream().filter(i -> i.rarity == Rarity.EPIC)
+        plugin.fishList().stream().filter(i -> i.rarity == Rarity.EPIC)
                 .forEach(fish -> {
                     var itemStack = fish.createItemStack();
                     addRecipeToTable(JOURNEYMAN_RECIPE_TABLE, 8, 0.05f, 20,
@@ -101,7 +99,7 @@ public class VillagerAcquireTradeListener implements Listener {
         // マスター漁師のレシピテーブルにレシピを追加
         addRecipeToTable(MASTER_RECIPE_TABLE, 12, 0.05f, 50,
                 new ItemStack(Material.EMERALD), new ItemStack(Material.PUFFERFISH, 4));
-        plugin.fishItems.fishList.stream().filter(i -> i.rarity == Rarity.LEGENDARY)
+        plugin.fishList().stream().filter(i -> i.rarity == Rarity.LEGENDARY)
                 .filter(i -> i.material == Material.COD)
                 .forEach(fish -> {
                     var itemStack = fish.createItemStack();

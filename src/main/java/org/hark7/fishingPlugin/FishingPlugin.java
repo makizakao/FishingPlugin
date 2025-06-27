@@ -2,7 +2,6 @@ package org.hark7.fishingPlugin;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.hark7.fishingPlugin.command.AddExpCommand;
@@ -10,14 +9,14 @@ import org.hark7.fishingPlugin.command.FishStatsCommand;
 import org.hark7.fishingPlugin.command.FishTopCommand;
 import org.hark7.fishingPlugin.command.UpgradePoleCommand;
 import org.hark7.fishingPlugin.listener.FishListener;
+import org.hark7.fishingPlugin.listener.PlayerPreLoginListener;
 import org.hark7.fishingPlugin.listener.VillagerAcquireTradeListener;
-
 import java.util.*;
 
 public class FishingPlugin extends JavaPlugin {
-    public final Map<UUID, Integer> fishingLevels = new HashMap<>();  // Playerごとの釣りレベル
-    public final Map<UUID, Integer> fishingExp = new HashMap<>();     // Playerごとの釣り経験値
-    public final FishItems fishItems = new FishItems();
+    private final FishItems fishItems = new FishItems();
+    private PlayerDataController controller;
+
 
     /**
      * プラグインの有効化時に呼び出されるメソッド
@@ -25,9 +24,10 @@ public class FishingPlugin extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+        controller = new PlayerDataController(this);
         getServer().getPluginManager().registerEvents(new FishListener(this), this);
         getServer().getPluginManager().registerEvents(new VillagerAcquireTradeListener(this), this);
-        loadConfig();
+        getServer().getPluginManager().registerEvents(new PlayerPreLoginListener(this), this);
         fishItems.initializeFishList();
         Recipes.register(this);
         // コマンドの追加
@@ -48,36 +48,9 @@ public class FishingPlugin extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-        saveCustomConfig();
+        Optional.ofNullable(controller).ifPresent(PlayerDataController::close);
         getLogger().info("FishingPlugin has been disabled!");
     }
-
-    private void loadConfig() {
-        FileConfiguration config = getConfig();
-        config.options().copyDefaults(true);
-        saveConfig();
-
-        if (config.contains("fishing_levels")) {
-            Optional.ofNullable(config.getConfigurationSection("fishing_levels"))
-                    .ifPresent(conf -> {
-                        for (String uuidString : conf.getKeys(false)) {
-                            UUID uuid = UUID.fromString(uuidString);
-                            fishingLevels.put(uuid, conf.getInt(uuidString));
-                            fishingExp.put(uuid, config.getInt("fishing_exp." + uuidString, 0));
-                        }
-                    });
-        }
-    }
-
-    private void saveCustomConfig() {
-        FileConfiguration config = getConfig();
-        for (Map.Entry<UUID, Integer> entry : fishingLevels.entrySet()) {
-            config.set("fishing_levels." + entry.getKey().toString(), entry.getValue());
-            config.set("fishing_exp." + entry.getKey().toString(), fishingExp.get(entry.getKey()));
-        }
-        saveConfig();
-    }
-
 
 
     /**
@@ -88,8 +61,9 @@ public class FishingPlugin extends JavaPlugin {
      * @param exp 追加する経験値
      */
     public void addExperience(UUID playerUUID, int exp) {
-        int currentExp = fishingExp.getOrDefault(playerUUID, 0) + exp;
-        int currentLevel = fishingLevels.getOrDefault(playerUUID, 1);
+        var playerData = playerDataMap().get(playerUUID);
+        int currentExp = playerData.getExp() + exp;
+        int currentLevel = playerData.getLevel();
 
         while (currentExp >= getRequiredExp(currentLevel)) {
             currentExp -= getRequiredExp(currentLevel);
@@ -99,20 +73,54 @@ public class FishingPlugin extends JavaPlugin {
                 player.sendMessage(ChatColor.GOLD + "釣りレベルが上がりました！ 現在のレベル: " + currentLevel);
             }
         }
+        controller.setPlayerExp(playerUUID, currentExp);
+        controller.setPlayerLevel(playerUUID, currentLevel);
+    }
 
-        fishingExp.put(playerUUID, currentExp);
-        fishingLevels.put(playerUUID, currentLevel);
+    public void addCount(UUID playerUUID, CustomFish.Rarity rarity) {
+        var playerData = playerDataMap().get(playerUUID);
+        int currentCount = playerData.getCount(rarity) + 1;
+        controller.setPlayerCount(playerUUID, rarity, currentCount);
     }
 
     public int getRequiredExp(int level) {
         return 100 * level * level;
     }
 
-    public Map<UUID, Integer> getFishingLevels() {
-        return fishingLevels;
+    /**
+     * プレイヤーのデータを取得します。
+     * データが存在しない場合は新規作成します。
+     *
+     * @param playerUUID プレイヤーのUUID
+     * @return PlayerData プレイヤーのデータ
+     */
+    public PlayerData getPlayerData(UUID playerUUID) {
+        // プレイヤーのデータが存在しない場合は新規作成
+        if (!playerDataMap().containsKey(playerUUID)) {
+            String displayName = Optional.ofNullable(getServer().getPlayer(playerUUID))
+                    .map(Player::getName).orElse("");
+            PlayerData newData = new PlayerData(displayName, 1, 0);
+            controller.setPlayerData(playerUUID, newData);
+            getLogger().warning("Player " + playerUUID + " does not exists. Created new Data!");
+            return newData;
+        }
+        return playerDataMap().get(playerUUID);
     }
 
-    public Map<UUID, Integer> getFishingExp() {
-        return fishingExp;
+    public List<CustomFish> fishList() {
+        return fishItems.fishList();
+    }
+
+    public Map<UUID, PlayerData> playerDataMap() {
+        return controller.getPlayerDataMap();
+    }
+
+    public void createPlayerData(String name, UUID playerUUID) {
+        if (!playerDataMap().containsKey(playerUUID)) {
+            var newData = new PlayerData(name,1, 0);
+            controller.setPlayerData(playerUUID, newData);
+        } else {
+            getLogger().warning("Player data for " + playerUUID + " already exists.");
+        }
     }
 }

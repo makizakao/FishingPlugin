@@ -1,13 +1,12 @@
 package org.hark7.fishingPlugin;
 
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FishItems {
-    public final List<CustomFish> fishList = new ArrayList<>();       // 釣り可能な魚のリスト
+    private final List<CustomFish> fishList = new ArrayList<>();       // 釣り可能な魚のリスト
 
     public void initializeFishList() {
         // Scrap fish
@@ -89,12 +88,17 @@ public class FishItems {
         // Legendary fish (8 types)
         addFish("幻の金色コイ", "伝説の魚", Material.COD, CustomFish.Rarity.LEGENDARY);
         addFish("深海の巨大イカ", "伝説の海獣", Material.COD, CustomFish.Rarity.LEGENDARY);
+        addFish(Material.FISHING_ROD, CustomFish.Rarity.LEGENDARY);
         addFish(Material.NAME_TAG, CustomFish.Rarity.LEGENDARY);
         addFish(Material.ENCHANTED_BOOK, CustomFish.Rarity.LEGENDARY);
         addFish(Material.BOW, CustomFish.Rarity.LEGENDARY);
         addFish(Material.ENCHANTED_BOOK, CustomFish.Rarity.LEGENDARY);
         addFish(Material.NAUTILUS_SHELL, CustomFish.Rarity.LEGENDARY);
         addFish(Material.SADDLE, CustomFish.Rarity.LEGENDARY);
+    }
+
+    public List<CustomFish> fishList() {
+        return List.copyOf(fishList);
     }
 
     private void addFish(String name, String description, Material material, CustomFish.Rarity rarity) {
