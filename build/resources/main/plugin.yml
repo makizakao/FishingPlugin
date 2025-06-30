@@ -1,5 +1,5 @@
 name: FishingPlugin
-version: '1.3-SNAPSHOT'
+version: '1.4-SNAPSHOT'
 main: org.hark7.fishingPlugin.FishingPlugin
 api-version: '1.21'
 commands:
@@ -15,5 +15,14 @@ commands:
   addexp:
     description: プレイヤーに釣りの経験値を追加します（OP専用）
     usage: /<command> <プレイヤー名> <経験値>
-    permission: fishingplugin.addexp
+    permission: fishingplugin.op
     permission-message: このコマンドを使用する権限がありません。
+  resetlevel:
+    description: プレイヤーの釣りレベルをリセットします（OP専用）
+    usage: /<command> <プレイヤー名>
+    permission: fishingplugin.op
+    permission-message: このコマンドを使用する権限がありません。
+permissions:
+    fishingplugin.op:
+        description: FishingPluginのOP権限
+        default: op

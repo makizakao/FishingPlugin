@@ -1,21 +1,26 @@
 package org.hark7.fishingPlugin;
 
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.hark7.fishingPlugin.command.AddExpCommand;
-import org.hark7.fishingPlugin.command.FishStatsCommand;
-import org.hark7.fishingPlugin.command.FishTopCommand;
-import org.hark7.fishingPlugin.command.UpgradePoleCommand;
+import org.hark7.fishingPlugin.command.*;
 import org.hark7.fishingPlugin.listener.FishListener;
 import org.hark7.fishingPlugin.listener.PlayerPreLoginListener;
 import org.hark7.fishingPlugin.listener.VillagerAcquireTradeListener;
+import org.hark7.fishingPlugin.playerdata.PlayerData;
+import org.hark7.fishingPlugin.playerdata.PlayerDataManager;
+import org.hark7.fishingPlugin.type.Fishable;
+
 import java.util.*;
 
 public class FishingPlugin extends JavaPlugin {
-    private final FishItems fishItems = new FishItems();
-    private PlayerDataController controller;
+    private final FishTable fishTable = new FishTable();
+    private PlayerDataManager saveManager;
+    private BukkitAudiences adventure;
+    private Config config;
 
 
     /**
@@ -24,11 +29,15 @@ public class FishingPlugin extends JavaPlugin {
      */
     @Override
     public void onEnable() {
-        controller = new PlayerDataController(this);
-        getServer().getPluginManager().registerEvents(new FishListener(this), this);
-        getServer().getPluginManager().registerEvents(new VillagerAcquireTradeListener(this), this);
-        getServer().getPluginManager().registerEvents(new PlayerPreLoginListener(this), this);
-        fishItems.initializeFishList();
+        // Adventure APIの初期化
+        adventure = BukkitAudiences.create(this);
+        saveManager = new PlayerDataManager(this);
+        config = new Config(this);
+
+        fishTable.initializeFishList();
+        Bukkit.getPluginManager().registerEvents(new FishListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new VillagerAcquireTradeListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerPreLoginListener(this), this);
         Recipes.register(this);
         // コマンドの追加
         Optional.ofNullable(getCommand("fishstats"))
@@ -39,6 +48,8 @@ public class FishingPlugin extends JavaPlugin {
                 .ifPresent(c -> c.setExecutor(new UpgradePoleCommand(this)));
         Optional.ofNullable(getCommand("addexp"))
                 .ifPresent(c -> c.setExecutor(new AddExpCommand(this)));
+        Optional.ofNullable(getCommand("resetlevel"))
+                .ifPresent(c -> c.setExecutor(new ResetLevelCommand(this, saveManager)));
         getLogger().info("FishingPlugin has been enabled!");
     }
 
@@ -48,7 +59,9 @@ public class FishingPlugin extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-        Optional.ofNullable(controller).ifPresent(PlayerDataController::close);
+        adventure.close();
+        config.save();
+        Optional.ofNullable(saveManager).ifPresent(PlayerDataManager::close);
         getLogger().info("FishingPlugin has been disabled!");
     }
 
@@ -62,25 +75,28 @@ public class FishingPlugin extends JavaPlugin {
      */
     public void addExperience(UUID playerUUID, int exp) {
         var playerData = playerDataMap().get(playerUUID);
-        int currentExp = playerData.getExp() + exp;
-        int currentLevel = playerData.getLevel();
+        int currentExp = playerData.exp() + exp;
+        int currentLevel = playerData.level();
 
         while (currentExp >= getRequiredExp(currentLevel)) {
             currentExp -= getRequiredExp(currentLevel);
             currentLevel++;
-            Player player = Bukkit.getPlayer(playerUUID);
-            if (player != null) {
-                player.sendMessage(ChatColor.GOLD + "釣りレベルが上がりました！ 現在のレベル: " + currentLevel);
+            var adventure = adventure();
+            if (adventure != null) {
+                adventure.player(playerUUID).sendMessage(Component
+                        .text("釣りレベルが上がりました！ 現在のレベル: ")
+                        .append(Component.text(currentLevel))
+                        .color(NamedTextColor.GOLD));
             }
         }
-        controller.setPlayerExp(playerUUID, currentExp);
-        controller.setPlayerLevel(playerUUID, currentLevel);
+        saveManager.setPlayerExp(playerUUID, currentExp);
+        saveManager.setPlayerLevel(playerUUID, currentLevel);
     }
 
-    public void addCount(UUID playerUUID, CustomFish.Rarity rarity) {
+    public void addCount(UUID playerUUID, Fishable.Rarity rarity) {
         var playerData = playerDataMap().get(playerUUID);
-        int currentCount = playerData.getCount(rarity) + 1;
-        controller.setPlayerCount(playerUUID, rarity, currentCount);
+        int currentCount = playerData.count(rarity) + 1;
+        saveManager.setPlayerCount(playerUUID, rarity, currentCount);
     }
 
     public int getRequiredExp(int level) {
@@ -100,27 +116,55 @@ public class FishingPlugin extends JavaPlugin {
             String displayName = Optional.ofNullable(getServer().getPlayer(playerUUID))
                     .map(Player::getName).orElse("");
             PlayerData newData = new PlayerData(displayName, 1, 0);
-            controller.setPlayerData(playerUUID, newData);
+            saveManager.setPlayerData(playerUUID, newData);
             getLogger().warning("Player " + playerUUID + " does not exists. Created new Data!");
             return newData;
         }
         return playerDataMap().get(playerUUID);
     }
 
-    public List<CustomFish> fishList() {
-        return fishItems.fishList();
+    public List<Fishable> fishList() {
+        return fishTable.fishList();
     }
 
     public Map<UUID, PlayerData> playerDataMap() {
-        return controller.getPlayerDataMap();
+        return saveManager.getPlayerDataMap();
     }
 
+    /**
+     * プレイヤーデータを新規作成します。
+     * 既にデータが存在する場合は警告を出力します。
+     *
+     * @param name プレイヤーの名前
+     * @param playerUUID プレイヤーのUUID
+     */
     public void createPlayerData(String name, UUID playerUUID) {
         if (!playerDataMap().containsKey(playerUUID)) {
             var newData = new PlayerData(name,1, 0);
-            controller.setPlayerData(playerUUID, newData);
+            saveManager.setPlayerData(playerUUID, newData);
         } else {
             getLogger().warning("Player data for " + playerUUID + " already exists.");
         }
+    }
+
+    /**
+     * Adventure APIのインスタンスを取得します。
+     * 初期化されていない場合は例外をスローします。
+     *
+     * @return BukkitAudiences Adventure APIのインスタンス
+     * @throws IllegalStateException FishingPluginが初期化されていない場合
+     */
+    public BukkitAudiences adventure() {
+        if (adventure == null) {
+            throw new IllegalStateException("FishingPlugin has not been initialized!");
+        }
+        return adventure;
+    }
+
+    public void updatePlayerTableVersion() {
+    }
+
+    public void updateCountTableVersion() {
+        
     }
 }

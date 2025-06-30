@@ -33,7 +33,7 @@ public class UpgradePoleCommand implements CommandExecutor {
             return true;
         }
         var playerUUID = player.getUniqueId();
-        int playerLevel = plugin.getPlayerData(playerUUID).getLevel();
+        int playerLevel = plugin.getPlayerData(playerUUID).level();
         int upgradeCost = calculateUpgradeCost(fishingRod);
 
         if (playerLevel < upgradeCost) {

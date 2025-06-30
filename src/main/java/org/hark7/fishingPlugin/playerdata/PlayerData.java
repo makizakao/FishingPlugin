@@ -1,13 +1,13 @@
-package org.hark7.fishingPlugin;
+package org.hark7.fishingPlugin.playerdata;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hark7.fishingPlugin.CustomFish.*;
+import org.hark7.fishingPlugin.type.Fishable.*;
 
 public class PlayerData {
-    private String playerName; // プレイヤー名
+    private final String playerName; // プレイヤー名
     private int fishingLevel;  // 釣りレベル
     private int fishingExp;    // 釣り経験値
     private final HashMap<Rarity, Integer> caughtFishCount = new HashMap<>();  // 釣った魚の数
@@ -27,7 +27,7 @@ public class PlayerData {
         getInitialCount();
     }
 
-    public int getLevel() {
+    public int level() {
         return fishingLevel;
     }
 
@@ -35,7 +35,7 @@ public class PlayerData {
         this.fishingLevel = fishingLevel;
     }
 
-    public int getExp() {
+    public int exp() {
         return fishingExp;
     }
 
@@ -46,18 +46,18 @@ public class PlayerData {
         return caughtFishCount;
     }
 
-    public int getCount(Rarity rarity) {
+    public int count(Rarity rarity) {
         return caughtFishCount.getOrDefault(rarity, 0);
     }
 
-    public int getCountAll() {
+    public int countAll() {
         return caughtFishCount.values().stream().mapToInt(Integer::intValue).sum();
     }
 
     public void addCount(Rarity rarity) {
         caughtFishCount.putIfAbsent(rarity, 0);
     }
-    public String getPlayerName() {
+    public String playerName() {
         return playerName;
     }
 

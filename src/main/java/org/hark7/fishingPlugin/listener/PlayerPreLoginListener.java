@@ -5,6 +5,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.hark7.fishingPlugin.FishingPlugin;
 
+/**
+ * プレイヤーのログイン前にデータを初期化するリスナー
+ * <p>
+ * プレイヤーが初めてログインする際に、データベースにプレイヤーデータを作成します。
+ */
 public class PlayerPreLoginListener implements Listener {
     FishingPlugin plugin;
 

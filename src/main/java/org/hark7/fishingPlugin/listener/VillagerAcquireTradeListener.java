@@ -1,5 +1,6 @@
 package org.hark7.fishingPlugin.listener;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Villager;
@@ -8,7 +9,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
-import org.hark7.fishingPlugin.CustomFish.*;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.hark7.fishingPlugin.type.CustomFish;
+import org.hark7.fishingPlugin.type.Fishable.*;
 import org.hark7.fishingPlugin.FishingPlugin;
 
 import java.util.ArrayList;
@@ -54,6 +57,7 @@ public class VillagerAcquireTradeListener implements Listener {
         addRecipeToTable(NOVICE_RECIPE_TABLE, 16, 0.05f, 1, new ItemStack(Material.COOKED_COD),
                 new ItemStack(Material.COD, 6), new ItemStack(Material.EMERALD));
         // 見習い漁師のレシピテーブルにレシピを追加
+        /*
         addRecipeToTable(APPRENTICE_RECIPE_TABLE, 16, 0.05f, 5,
                 new ItemStack(Material.EMERALD), new ItemStack(Material.COD, 15));
         addRecipeToTable(APPRENTICE_RECIPE_TABLE, 16, 0.05f, 5,
@@ -63,7 +67,11 @@ public class VillagerAcquireTradeListener implements Listener {
         addRecipeToTable(APPRENTICE_RECIPE_TABLE, 16, 0.05f, 5,
                 new ItemStack(Material.COOKED_SALMON),
                 new ItemStack(Material.SALMON, 20), new ItemStack(Material.EMERALD));
-        plugin.fishList().stream().filter(i -> i.rarity == Rarity.RARE)
+         */
+        plugin.fishList().stream()
+                .filter(i -> i.rarity() == Rarity.RARE)
+                .filter(i -> i instanceof CustomFish)
+                .map(i -> (CustomFish) i)
                 .forEach(fish -> {
                     var itemStack = fish.createItemStack();
                     itemStack.setAmount(5);
@@ -85,7 +93,10 @@ public class VillagerAcquireTradeListener implements Listener {
             addRecipeToTable(JOURNEYMAN_RECIPE_TABLE, 3, 0.02f, 5,
                     itemStack, new ItemStack(Material.EMERALD, 8 + (level - 1) * 7));
         });
-        plugin.fishList().stream().filter(i -> i.rarity == Rarity.EPIC)
+        plugin.fishList().stream()
+                .filter(i -> i.rarity() == Rarity.EPIC)
+                .filter(i -> i instanceof CustomFish)
+                .map(i -> (CustomFish) i)
                 .forEach(fish -> {
                     var itemStack = fish.createItemStack();
                     addRecipeToTable(JOURNEYMAN_RECIPE_TABLE, 8, 0.05f, 20,
@@ -99,8 +110,9 @@ public class VillagerAcquireTradeListener implements Listener {
         // マスター漁師のレシピテーブルにレシピを追加
         addRecipeToTable(MASTER_RECIPE_TABLE, 12, 0.05f, 50,
                 new ItemStack(Material.EMERALD), new ItemStack(Material.PUFFERFISH, 4));
-        plugin.fishList().stream().filter(i -> i.rarity == Rarity.LEGENDARY)
-                .filter(i -> i.material == Material.COD)
+        plugin.fishList().stream().filter(i -> i.rarity() == Rarity.LEGENDARY)
+                .filter(e -> e instanceof CustomFish)
+                .map(i -> (CustomFish) i)
                 .forEach(fish -> {
                     var itemStack = fish.createItemStack();
                     addRecipeToTable(MASTER_RECIPE_TABLE, 3, 0.05f, 30,
@@ -126,80 +138,61 @@ public class VillagerAcquireTradeListener implements Listener {
         // 村人が漁師の取引を獲得した場合の処理
         if (!(event.getEntity() instanceof Villager villager)) return;
         if (!villager.getProfession().equals(Villager.Profession.FISHERMAN)) return;
+
         var rand = new Random();
-        var recipes = new ArrayList<>(villager.getRecipes());
         switch (villager.getVillagerLevel()) {
             case 1:
-                // 新米漁師のレシピをランダムに選択
-                for (int i = 0; i < 2; i++) {
-                    while (true) {
-                        var noviceRecipe = NOVICE_RECIPE_TABLE.get(rand.nextInt(NOVICE_RECIPE_TABLE.size()));
-                        var exp = Math.max(2, noviceRecipe.getVillagerExperience());
-                        noviceRecipe.setVillagerExperience(exp);
-                        if (checkExistRecipe(noviceRecipe, recipes)) continue;
-                        recipes.add(noviceRecipe);
-                        break;
-                    }
-                }
-                villager.setRecipes(recipes);
+                setRecipes(NOVICE_RECIPE_TABLE, villager, rand, 2);
                 break;
             case 2:
-                // 見習い漁師のレシピをランダムに選択
-                for (int i = 0; i < 2; i++) {
-                    while (true) {
-                        var apprenticeRecipe = APPRENTICE_RECIPE_TABLE.get(rand.nextInt(APPRENTICE_RECIPE_TABLE.size()));
-                        if (checkExistRecipe(apprenticeRecipe, recipes)) continue;
-                        recipes.add(apprenticeRecipe);
-                        break;
-                    }
-                }
-                villager.setRecipes(recipes);
+                setRecipes(APPRENTICE_RECIPE_TABLE, villager, rand, 2);
                 break;
             case 3:
-                // 一人前漁師のレシピをランダムに選択
-                for (int i = 0; i < 2; i++) {
-                    while (true) {
-                        var journeymanRecipe = JOURNEYMAN_RECIPE_TABLE.get(rand.nextInt(JOURNEYMAN_RECIPE_TABLE.size()));
-                        if (checkExistRecipe(journeymanRecipe, recipes)) continue;
-                        recipes.add(journeymanRecipe);
-                        break;
-                    }
-                }
-                villager.setRecipes(recipes);
+                setRecipes(JOURNEYMAN_RECIPE_TABLE, villager, rand, 2);
                 break;
             case 4:
-                // 熟練漁師のレシピをランダムに選択
-                while (true) {
-                    var expertRecipe = EXPERT_RECIPE_TABLE.get(rand.nextInt(EXPERT_RECIPE_TABLE.size()));
-                    if (checkExistRecipe(expertRecipe, recipes)) continue;
-                    recipes.add(expertRecipe);
-                    break;
-                }
-                villager.setRecipes(recipes);
+                setRecipes(EXPERT_RECIPE_TABLE, villager, rand, 1);
                 break;
             case 5:
-                // マスター漁師のレシピをランダムに選択
-                for (int i = 0; i < 2; i++) {
-                    while (true) {
-                        var masterRecipe = MASTER_RECIPE_TABLE.get(rand.nextInt(MASTER_RECIPE_TABLE.size()));
-                        if (checkExistRecipe(masterRecipe, recipes)) continue;
-                        recipes.add(masterRecipe);
-                        break;
-                    }
-                }
-                villager.setRecipes(recipes);
+                setRecipes(MASTER_RECIPE_TABLE, villager, rand, 2);
                 break;
         }
         event.setCancelled(true);
     }
 
+    private void setRecipes(List<MerchantRecipe> table, Villager villager, Random rand, int count) {
+        var newRecipes = new ArrayList<>(villager.getRecipes());
+        var candidates = new ArrayList<MerchantRecipe>();
+        for (var recipe : table) {
+            if (!checkExistRecipe(recipe, newRecipes)) {
+                candidates.add(recipe);
+            }
+        }
+        int addCount = Math.min(count, candidates.size());
+        for (int i = 0; i < addCount; i++) {
+            var recipe = candidates.remove(rand.nextInt(candidates.size()));
+            if (checkExistRecipe(recipe, newRecipes)) continue;
+            newRecipes.add(recipe);
+        }
+        Bukkit.getScheduler().runTask(JavaPlugin.getProvidingPlugin(getClass()), () -> villager.setRecipes(newRecipes));
+    }
+
     // 既存のレシピと同じかどうかをチェックするメソッド
     private boolean checkExistRecipe(MerchantRecipe recipe, List<MerchantRecipe> recipes) {
         for (MerchantRecipe r : recipes) {
-            if (r.getResult().isSimilar(recipe.getResult()) && r.getIngredients().equals(recipe.getIngredients())) {
+            if (r.getResult().isSimilar(recipe.getResult()) &&
+                    ingredientsSimilar(r.getIngredients(), recipe.getIngredients())) {
                 return true;
             }
         }
         return false;
+    }
+
+    private boolean ingredientsSimilar(List<ItemStack> a, List<ItemStack> b) {
+        if (a.size() != b.size()) return false;
+        for (int i = 0; i < a.size(); i++) {
+            if (!a.get(i).isSimilar(b.get(i))) return false;
+        }
+        return true;
     }
 }
