@@ -8,6 +8,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ItemFish implements MaterialFish {
     private final Component name;
@@ -24,7 +25,10 @@ public class ItemFish implements MaterialFish {
      * @param enchantments 付与されるエンチャント
      */
     public ItemFish(Material material, Rarity rarity, EnchantmentValue... enchantments) {
-        this.name = Component.translatable(material.getTranslationKey());
+        this.name = Optional.ofNullable(material.getItemTranslationKey())
+                .map(Component::translatable)
+                .map(c -> (Component) c)
+                .orElse(Component.text(""));
         this.material = material;
         this.rarity = rarity;
         this.enchantments = enchantments;
@@ -40,7 +44,10 @@ public class ItemFish implements MaterialFish {
      * @param enchantments 付与されるエンチャント
      */
     public ItemFish(Material material, Rarity rarity, int damage, EnchantmentValue... enchantments) {
-        this.name = Component.translatable(material.getTranslationKey());
+        this.name = Optional.ofNullable(material.getItemTranslationKey())
+                .map(Component::translatable)
+                .map(c -> (Component) c)
+                .orElse(Component.text(""));
         this.material = material;
         this.rarity = rarity;
         this.damage = damage;

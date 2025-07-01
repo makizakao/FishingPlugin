@@ -1,6 +1,5 @@
 package org.hark7.fishingPlugin;
 
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -19,7 +18,6 @@ import java.util.*;
 public class FishingPlugin extends JavaPlugin {
     private final FishTable fishTable = new FishTable();
     private PlayerDataManager saveManager;
-    private BukkitAudiences adventure;
     private Config config;
 
 
@@ -29,8 +27,6 @@ public class FishingPlugin extends JavaPlugin {
      */
     @Override
     public void onEnable() {
-        // Adventure APIの初期化
-        adventure = BukkitAudiences.create(this);
         saveManager = new PlayerDataManager(this);
         config = new Config(this);
 
@@ -59,7 +55,6 @@ public class FishingPlugin extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-        adventure.close();
         config.save();
         Optional.ofNullable(saveManager).ifPresent(PlayerDataManager::close);
         getLogger().info("FishingPlugin has been disabled!");
@@ -81,13 +76,12 @@ public class FishingPlugin extends JavaPlugin {
         while (currentExp >= getRequiredExp(currentLevel)) {
             currentExp -= getRequiredExp(currentLevel);
             currentLevel++;
-            var adventure = adventure();
-            if (adventure != null) {
-                adventure.player(playerUUID).sendMessage(Component
-                        .text("釣りレベルが上がりました！ 現在のレベル: ")
-                        .append(Component.text(currentLevel))
-                        .color(NamedTextColor.GOLD));
-            }
+            var player = Bukkit.getPlayer(playerUUID);
+            if(player == null) return;
+            player.sendMessage(Component
+                    .text("釣りレベルが上がりました！ 現在のレベル: ")
+                    .append(Component.text(currentLevel))
+                    .color(NamedTextColor.GOLD));
         }
         saveManager.setPlayerExp(playerUUID, currentExp);
         saveManager.setPlayerLevel(playerUUID, currentLevel);
@@ -147,19 +141,6 @@ public class FishingPlugin extends JavaPlugin {
         }
     }
 
-    /**
-     * Adventure APIのインスタンスを取得します。
-     * 初期化されていない場合は例外をスローします。
-     *
-     * @return BukkitAudiences Adventure APIのインスタンス
-     * @throws IllegalStateException FishingPluginが初期化されていない場合
-     */
-    public BukkitAudiences adventure() {
-        if (adventure == null) {
-            throw new IllegalStateException("FishingPlugin has not been initialized!");
-        }
-        return adventure;
-    }
 
     public void updatePlayerTableVersion() {
     }

@@ -79,21 +79,17 @@ public class FishListener implements Listener {
             plugin.addExperience(playerUUID, totalExp);
             plugin.addCount(playerUUID, caughtFish.rarity());
 
-            var adventure = plugin.adventure();
-            if (adventure != null) {
-                adventure.player(playerUUID);
-                adventure.player(playerUUID).sendMessage(Component
-                        .text("あなたは")
-                        .append(caughtFish.name().color(caughtFish.rarity().textColor()))
-                        .append(Component.text("を釣りあげました！")));
-                adventure.player(playerUUID).sendMessage(Component
-                        .text("経験値を獲得しました: ")
-                        .append(Component.text(totalExp))
-                        .append(Component.text(" (ボーナス: "))
-                        .append(Component.text(bonusExp))
-                        .append(Component.text(")"))
-                        .color(NamedTextColor.YELLOW));
-            }
+            player.sendMessage(Component
+                    .text("あなたは")
+                    .append(caughtFish.name().color(caughtFish.rarity().textColor()))
+                    .append(Component.text("を釣りあげました！")));
+            player.sendMessage(Component
+                    .text("経験値を獲得しました: ")
+                    .append(Component.text(totalExp))
+                    .append(Component.text(" (ボーナス: "))
+                    .append(Component.text(bonusExp))
+                    .append(Component.text(")"))
+                    .color(NamedTextColor.YELLOW));
         }
     }
 
