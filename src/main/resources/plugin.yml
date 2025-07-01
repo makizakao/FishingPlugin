@@ -1,5 +1,5 @@
 name: FishingPlugin
-version: '1.5-SNAPSHOT'
+version: '@version@'
 main: org.hark7.fishingPlugin.FishingPlugin
 api-version: '1.21'
 commands:
