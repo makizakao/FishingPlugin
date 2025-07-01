@@ -11,7 +11,7 @@ shadowJar {
     archiveFileName = "${project.name}-${project.version}.jar"
     dependencies {
         // sqlite-jdbc is already included in the implementation dependencies
-        exclude(dependency("org.xerial:sqlite-jdbc"))
+        include(dependency('com.github.kangarko:Foundation'))
     }
 }
 
@@ -19,6 +19,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
     // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
     implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.50.1.0'
+    implementation 'com.github.kangarko:Foundation:6.9.20'
 }
 
 tasks {
