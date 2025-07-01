@@ -24,10 +24,10 @@ public class CustomFish implements MaterialFish {
     /**
      * 魚のコンストラクタ
      *
-     * @param name 魚の名前
-     * @param material 魚の素材
+     * @param name        魚の名前
+     * @param material    魚の素材
      * @param description 魚の説明
-     * @param rarity 魚のレアリティ
+     * @param rarity      魚のレアリティ
      */
     public CustomFish(String name, Material material, String description, Rarity rarity) {
         this.name = Component.text(name);

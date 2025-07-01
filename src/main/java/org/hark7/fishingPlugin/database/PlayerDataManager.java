@@ -1,4 +1,4 @@
-package org.hark7.fishingPlugin.playerdata;
+package org.hark7.fishingPlugin.database;
 
 import org.hark7.fishingPlugin.FishingPlugin;
 import org.hark7.fishingPlugin.type.Fishable.*;
@@ -42,31 +42,31 @@ public class PlayerDataManager {
     private void createPlayersTable(String tableName, Statement statement) throws SQLException {
         statement.executeUpdate(
                 "CREATE TABLE IF NOT EXISTS " + tableName + " (" +
-                "uuid TEXT PRIMARY KEY," +
-                "name TEXT NOT NULL," +
-                "level INTEGER NOT NULL DEFAULT 0," +
-                "exp INTEGER NOT NULL DEFAULT 0" +
-                ")"
+                        "uuid TEXT PRIMARY KEY," +
+                        "name TEXT NOT NULL," +
+                        "level INTEGER NOT NULL DEFAULT 0," +
+                        "exp INTEGER NOT NULL DEFAULT 0" +
+                        ")"
         );
     }
 
     private void createCountsTable(String tableName, Statement statement) throws SQLException {
         statement.executeUpdate(
                 "CREATE TABLE IF NOT EXISTS " + tableName + " (" +
-                "uuid TEXT PRIMARY KEY," +
-                "scrap INTEGER NOT NULL DEFAULT 0," +
-                "common INTEGER NOT NULL DEFAULT 0," +
-                "uncommon INTEGER NOT NULL DEFAULT 0," +
-                "rare INTEGER NOT NULL DEFAULT 0," +
-                "epic INTEGER NOT NULL DEFAULT 0," +
-                "legendary INTEGER NOT NULL DEFAULT 0," +
-                "FOREIGN KEY(uuid) REFERENCES players(uuid)" +
-                ")"
+                        "uuid TEXT PRIMARY KEY," +
+                        "scrap INTEGER NOT NULL DEFAULT 0," +
+                        "common INTEGER NOT NULL DEFAULT 0," +
+                        "uncommon INTEGER NOT NULL DEFAULT 0," +
+                        "rare INTEGER NOT NULL DEFAULT 0," +
+                        "epic INTEGER NOT NULL DEFAULT 0," +
+                        "legendary INTEGER NOT NULL DEFAULT 0," +
+                        "FOREIGN KEY(uuid) REFERENCES players(uuid)" +
+                        ")"
         );
     }
 
 
-    public void updatePlayerTableVersion() {
+    public void updatePlayersTableVersion() {
         try (Statement statement = connection.createStatement()) {
             statement.setQueryTimeout(10);
             statement.executeUpdate(
@@ -88,7 +88,7 @@ public class PlayerDataManager {
         }
     }
 
-    public void updateCountTableVersion() {
+    public void updateCountsTableVersion() {
         try (Statement statement = connection.createStatement()) {
             statement.setQueryTimeout(10);
             statement.executeUpdate(
@@ -116,8 +116,8 @@ public class PlayerDataManager {
 
     public synchronized PlayerData getPlayerData(UUID playerUUID) {
         String sql = "SELECT p.uuid, p.name, p.level, p.exp, " +
-                     "c.scrap, c.common, c.uncommon, c.rare, c.epic, c.legendary " +
-                     "FROM players p LEFT JOIN counts c ON p.uuid = c.uuid WHERE p.uuid = ?";
+                "c.scrap, c.common, c.uncommon, c.rare, c.epic, c.legendary " +
+                "FROM players p LEFT JOIN counts c ON p.uuid = c.uuid WHERE p.uuid = ?";
         var count = new ConcurrentHashMap<Rarity, Integer>();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, playerUUID.toString());
@@ -146,8 +146,8 @@ public class PlayerDataManager {
     public synchronized Map<UUID, PlayerData> getPlayerDataMap() {
         Map<UUID, PlayerData> playerDataMap = new ConcurrentHashMap<>();
         String sql = "SELECT p.uuid, p.name, p.level, p.exp, " +
-                     "c.scrap, c.common, c.uncommon, c.rare, c.epic, c.legendary " +
-                     "FROM players p LEFT JOIN counts c ON p.uuid = c.uuid";
+                "c.scrap, c.common, c.uncommon, c.rare, c.epic, c.legendary " +
+                "FROM players p LEFT JOIN counts c ON p.uuid = c.uuid";
         try (Statement statement = connection.createStatement();
              ResultSet rs = statement.executeQuery(sql)) {
             while (rs.next()) {
@@ -176,14 +176,14 @@ public class PlayerDataManager {
     public synchronized void setPlayerData(UUID playerUUID, PlayerData playerData) {
         String playerSql =
                 "INSERT INTO players (uuid, name, level, exp) VALUES (?, ?, ?, ?) " +
-                "ON CONFLICT(uuid) DO UPDATE SET name=excluded.name, level=excluded.level, exp=excluded.exp";
+                        "ON CONFLICT(uuid) DO UPDATE SET name=excluded.name, level=excluded.level, exp=excluded.exp";
         String countSql =
                 "INSERT INTO counts (uuid, scrap, common, uncommon, rare, epic, legendary) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?) " +
-                "ON CONFLICT(uuid) DO UPDATE SET " +
-                "scrap=excluded.scrap, common=excluded.common, " +
-                "uncommon=excluded.uncommon, rare=excluded.rare, " +
-                "epic=excluded.epic, legendary=excluded.legendary";
+                        "VALUES (?, ?, ?, ?, ?, ?, ?) " +
+                        "ON CONFLICT(uuid) DO UPDATE SET " +
+                        "scrap=excluded.scrap, common=excluded.common, " +
+                        "uncommon=excluded.uncommon, rare=excluded.rare, " +
+                        "epic=excluded.epic, legendary=excluded.legendary";
         try (PreparedStatement playerPs = connection.prepareStatement(playerSql);
              PreparedStatement countPs = connection.prepareStatement(countSql)) {
             playerPs.setString(1, playerUUID.toString());

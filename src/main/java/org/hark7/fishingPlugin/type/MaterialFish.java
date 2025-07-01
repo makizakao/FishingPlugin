@@ -5,5 +5,6 @@ import org.bukkit.inventory.ItemStack;
 
 public interface MaterialFish extends Fishable {
     Material material();
+
     ItemStack createItemStack();
 }

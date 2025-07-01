@@ -1,4 +1,4 @@
-package org.hark7.fishingPlugin.command;
+package org.hark7.fishingPlugin.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -7,7 +7,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.hark7.fishingPlugin.FishingPlugin;
-import org.hark7.fishingPlugin.playerdata.PlayerData;
+import org.hark7.fishingPlugin.database.PlayerData;
 import org.hark7.fishingPlugin.type.Fishable.Rarity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

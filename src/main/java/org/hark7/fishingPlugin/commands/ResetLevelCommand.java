@@ -1,4 +1,4 @@
-package org.hark7.fishingPlugin.command;
+package org.hark7.fishingPlugin.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -6,8 +6,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.hark7.fishingPlugin.FishingPlugin;
-import org.hark7.fishingPlugin.playerdata.PlayerData;
-import org.hark7.fishingPlugin.playerdata.PlayerDataManager;
+import org.hark7.fishingPlugin.database.PlayerData;
+import org.hark7.fishingPlugin.database.PlayerDataManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,6 +17,7 @@ import java.util.List;
 public class ResetLevelCommand implements CommandExecutor, TabExecutor {
     private final FishingPlugin plugin;
     private final PlayerDataManager manager;
+
     public ResetLevelCommand(FishingPlugin plugin, PlayerDataManager manager) {
         this.plugin = plugin;
         this.manager = manager;

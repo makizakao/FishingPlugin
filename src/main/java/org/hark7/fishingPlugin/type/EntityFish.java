@@ -10,7 +10,7 @@ public class EntityFish implements Fishable {
     private final EntityType entity;
 
     public EntityFish(EntityType entity, Rarity rarity) {
-        this.name = Component.translatable(entity.getTranslationKey());
+        this.name = Component.translatable(entity.translationKey());
         this.rarity = rarity;
         this.entity = entity;
     }

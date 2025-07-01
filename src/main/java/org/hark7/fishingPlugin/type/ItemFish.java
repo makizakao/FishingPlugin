@@ -20,8 +20,8 @@ public class ItemFish implements MaterialFish {
     /**
      * 魚のコンストラクタ（名前と素材のみ）
      *
-     * @param material アイテム
-     * @param rarity レアリティ
+     * @param material     アイテム
+     * @param rarity       レアリティ
      * @param enchantments 付与されるエンチャント
      */
     public ItemFish(Material material, Rarity rarity, EnchantmentValue... enchantments) {
@@ -38,16 +38,13 @@ public class ItemFish implements MaterialFish {
     /**
      * 魚のコンストラクタ（名前、素材、ダメージ値）
      *
-     * @param material アイテム
-     * @param rarity レアリティ
-     * @param damage ダメージ値
+     * @param material     アイテム
+     * @param rarity       レアリティ
+     * @param damage       ダメージ値
      * @param enchantments 付与されるエンチャント
      */
     public ItemFish(Material material, Rarity rarity, int damage, EnchantmentValue... enchantments) {
-        this.name = Optional.ofNullable(material.getItemTranslationKey())
-                .map(Component::translatable)
-                .map(c -> (Component) c)
-                .orElse(Component.text(""));
+        this.name = Component.translatable(material.translationKey());
         this.material = material;
         this.rarity = rarity;
         this.damage = damage;

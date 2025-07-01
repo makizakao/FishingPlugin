@@ -1,0 +1,4 @@
+Locale: en
+DatabaseVersion:
+  PlayersTableVersion: 1
+  CountsTableVersion: 1

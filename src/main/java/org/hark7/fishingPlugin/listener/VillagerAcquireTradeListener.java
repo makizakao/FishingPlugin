@@ -31,7 +31,7 @@ public class VillagerAcquireTradeListener implements Listener {
     private static final List<MerchantRecipe> JOURNEYMAN_RECIPE_TABLE = new ArrayList<>();
     private static final List<MerchantRecipe> EXPERT_RECIPE_TABLE = new ArrayList<>();
     private static final List<MerchantRecipe> MASTER_RECIPE_TABLE = new ArrayList<>();
-    private static final Enchantment[] fishRodEnchantments = new Enchantment[] {
+    private static final Enchantment[] fishRodEnchantments = new Enchantment[]{
             Enchantment.LUCK_OF_THE_SEA,
             Enchantment.LURE,
             Enchantment.UNBREAKING,
@@ -40,6 +40,7 @@ public class VillagerAcquireTradeListener implements Listener {
 
     /**
      * レシピテーブルを設定します。
+     *
      * @param plugin FishingPluginのインスタンス
      */
     public VillagerAcquireTradeListener(FishingPlugin plugin) {

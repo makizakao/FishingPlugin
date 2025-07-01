@@ -1,5 +1,5 @@
 name: FishingPlugin
-version: '@version@'
+version: '1.5-SNAPSHOT'
 main: org.hark7.fishingPlugin.FishingPlugin
 api-version: '1.21'
 commands:
@@ -23,6 +23,6 @@ commands:
     permission: fishingplugin.op
     permission-message: このコマンドを使用する権限がありません。
 permissions:
-    fishingplugin.op:
-        description: FishingPluginのOP権限
-        default: op
+  fishingplugin.op:
+    description: FishingPluginのOP権限
+    default: op

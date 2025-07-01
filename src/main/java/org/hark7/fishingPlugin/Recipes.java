@@ -14,7 +14,7 @@ import java.util.Arrays;
 public final class Recipes {
     public static void register(FishingPlugin plugin) {
         // 魚のレシピを登録
-        var fishList = new Material[] {
+        var fishList = new Material[]{
                 Material.COD, Material.SALMON, Material.TROPICAL_FISH, Material.PUFFERFISH
         };
         Arrays.stream(fishList).forEach(m -> {

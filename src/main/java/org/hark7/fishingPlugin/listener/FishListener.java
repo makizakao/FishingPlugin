@@ -114,7 +114,7 @@ public class FishListener implements Listener {
      * プレイヤーのレベルが高いほど、レアリティの確率が上昇します。
      *
      * @param playerLevel プレイヤーのレベル
-     * @param fishingRod 釣り竿のアイテムスタック
+     * @param fishingRod  釣り竿のアイテムスタック
      * @return レアリティボーナス
      */
     private double calculateRarityBonus(int playerLevel, ItemStack fishingRod) {
@@ -155,7 +155,7 @@ public class FishListener implements Listener {
      * ランダムな値に基づいてレアリティを決定します。
      * レアリティの確率はプレイヤーのレベルと釣り竿のエンチャントによって変動します。
      *
-     * @param random ランダムな値
+     * @param random      ランダムな値
      * @param rarityBonus レアリティボーナス
      * @return 選択されたレアリティ
      */
@@ -212,9 +212,9 @@ public class FishListener implements Listener {
             enchantments.add(new EnchantmentValue(Enchantment.INFINITY, 1));
         }
         // 耐久値を設定
-        if (playerLevel >=  3) damage = Math.max(0, damage - rand.nextInt(30));
-        if (playerLevel >=  5) damage = Math.max(0, damage - rand.nextInt(30));
-        if (playerLevel >=  7) damage = Math.max(0, damage - rand.nextInt(30));
+        if (playerLevel >= 3) damage = Math.max(0, damage - rand.nextInt(30));
+        if (playerLevel >= 5) damage = Math.max(0, damage - rand.nextInt(30));
+        if (playerLevel >= 7) damage = Math.max(0, damage - rand.nextInt(30));
         if (playerLevel >= 10) damage = Math.max(0, damage - rand.nextInt(30));
         if (playerLevel >= 12) damage = Math.max(0, damage - rand.nextInt(30));
         if (playerLevel >= 15) damage = Math.max(0, damage - rand.nextInt(40));
@@ -226,8 +226,9 @@ public class FishListener implements Listener {
     /**
      * プレイヤーのレベルに応じて釣り竿を生成します。
      * 耐久力、入れ食い、宝釣りのエンチャントがランダムに付与されます。
-     * @param playerLevel　プレイヤーのレベル
-     * return 釣り竿
+     *
+     * @param playerLevel 　プレイヤーのレベル
+     *                    return 釣り竿
      */
     private ItemFish getFishingLod(int playerLevel) {
         var rand = new Random();
@@ -255,9 +256,9 @@ public class FishListener implements Listener {
             enchantments.add(new EnchantmentValue(Enchantment.LUCK_OF_THE_SEA, level));
         }
         // 耐久値を設定
-        if (playerLevel >=  3) damage = Math.max(0, damage - rand.nextInt(10));
-        if (playerLevel >=  5) damage = Math.max(0, damage - rand.nextInt(10));
-        if (playerLevel >=  7) damage = Math.max(0, damage - rand.nextInt(10));
+        if (playerLevel >= 3) damage = Math.max(0, damage - rand.nextInt(10));
+        if (playerLevel >= 5) damage = Math.max(0, damage - rand.nextInt(10));
+        if (playerLevel >= 7) damage = Math.max(0, damage - rand.nextInt(10));
         if (playerLevel >= 10) damage = Math.max(0, damage - rand.nextInt(10));
         if (playerLevel >= 12) damage = Math.max(0, damage - rand.nextInt(10));
         if (playerLevel >= 15) damage = Math.max(0, damage - rand.nextInt(10));
@@ -277,7 +278,8 @@ public class FishListener implements Listener {
         var rand = new Random();
         var enchantment = enchantments[rand.nextInt(enchantments.length)];
         var level = 1;
-        if (2 < enchantment.getMaxLevel()) level += rand.nextInt(Math.min(enchantment.getMaxLevel(), playerLevel / 5) + 1);
+        if (2 < enchantment.getMaxLevel())
+            level += rand.nextInt(Math.min(enchantment.getMaxLevel(), playerLevel / 5) + 1);
         else level += rand.nextInt(Math.min(enchantment.getMaxLevel(), playerLevel / 10) + 1);
         return new ItemFish(Material.ENCHANTED_BOOK, Rarity.LEGENDARY, 0,
                 new EnchantmentValue(enchantment, level));

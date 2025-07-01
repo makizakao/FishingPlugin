@@ -73,15 +73,6 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <release>21</release>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.5.1</version>
                 <executions>
@@ -90,16 +81,22 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
-                        <configuration>
-                            <artifactSet>
-                                <includes>
-                                    <include>com.github.kangarko:Foundation</include>
-                                </includes>
-                            </artifactSet>
-                            <finalName>${project.artifactId}-${project.version}</finalName>
-                        </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <artifactSet>
+                        <includes>
+                            <include>com.github.kangarko:Foundation*</include>
+                        </includes>
+                    </artifactSet>
+                    <relocations>
+                        <relocation>
+                            <pattern>org.mineacademy.fo</pattern>
+                            <shadedPattern>your.plugin.main.package.lib</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

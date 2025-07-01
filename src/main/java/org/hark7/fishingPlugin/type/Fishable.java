@@ -8,7 +8,9 @@ import org.bukkit.enchantments.Enchantment;
 
 public interface Fishable {
     Component name();
+
     FishType fishType();
+
     Rarity rarity();
 
     enum FishType {
@@ -23,7 +25,8 @@ public interface Fishable {
         UNCOMMON(20, 4, ChatColor.GREEN, NamedTextColor.GREEN),
         RARE(40, 6, ChatColor.BLUE, NamedTextColor.BLUE),
         EPIC(100, 10, ChatColor.DARK_PURPLE, NamedTextColor.DARK_PURPLE),
-        LEGENDARY(250, 15, ChatColor.GOLD, NamedTextColor.GOLD),;
+        LEGENDARY(250, 15, ChatColor.GOLD, NamedTextColor.GOLD),
+        ;
 
         private final int expValue;
         private final int pExpValue;
@@ -48,6 +51,7 @@ public interface Fishable {
         public ChatColor chatColor() {
             return chatColor;
         }
+
         public TextColor textColor() {
             return textColor;
         }

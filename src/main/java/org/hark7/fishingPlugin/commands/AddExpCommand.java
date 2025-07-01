@@ -1,4 +1,4 @@
-package org.hark7.fishingPlugin.command;
+package org.hark7.fishingPlugin.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

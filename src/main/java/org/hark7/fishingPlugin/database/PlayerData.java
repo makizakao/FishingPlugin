@@ -1,4 +1,4 @@
-package org.hark7.fishingPlugin.playerdata;
+package org.hark7.fishingPlugin.database;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +42,7 @@ public class PlayerData {
     public void setExp(int fishingExp) {
         this.fishingExp = fishingExp;
     }
+
     public Map<Rarity, Integer> getCounts() {
         return caughtFishCount;
     }
@@ -57,6 +58,7 @@ public class PlayerData {
     public void addCount(Rarity rarity) {
         caughtFishCount.putIfAbsent(rarity, 0);
     }
+
     public String playerName() {
         return playerName;
     }

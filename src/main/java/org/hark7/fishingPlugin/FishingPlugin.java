@@ -4,32 +4,34 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.hark7.fishingPlugin.command.*;
+import org.hark7.fishingPlugin.commands.*;
+import org.hark7.fishingPlugin.database.DatabaseVersionManager;
 import org.hark7.fishingPlugin.listener.FishListener;
 import org.hark7.fishingPlugin.listener.PlayerPreLoginListener;
 import org.hark7.fishingPlugin.listener.VillagerAcquireTradeListener;
-import org.hark7.fishingPlugin.playerdata.PlayerData;
-import org.hark7.fishingPlugin.playerdata.PlayerDataManager;
+import org.hark7.fishingPlugin.database.PlayerData;
+import org.hark7.fishingPlugin.database.PlayerDataManager;
 import org.hark7.fishingPlugin.type.Fishable;
+import org.mineacademy.fo.plugin.SimplePlugin;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
-public class FishingPlugin extends JavaPlugin {
+public class FishingPlugin extends SimplePlugin {
     private final FishTable fishTable = new FishTable();
     private PlayerDataManager saveManager;
-    private Config config;
-
 
     /**
      * プラグインの有効化時に呼び出されるメソッド
      * イベントリスナーの登録、設定ファイルの読み込み、レシピの登録を行います。
      */
     @Override
-    public void onEnable() {
+    public void onPluginStart() {
         saveManager = new PlayerDataManager(this);
-        config = new Config(this);
-
+        var dbVersionManager = new DatabaseVersionManager(this, saveManager);
+        dbVersionManager.checkAndMigrate();
         fishTable.initializeFishList();
         Bukkit.getPluginManager().registerEvents(new FishListener(this), this);
         Bukkit.getPluginManager().registerEvents(new VillagerAcquireTradeListener(this), this);
@@ -54,8 +56,7 @@ public class FishingPlugin extends JavaPlugin {
      * 設定ファイルの保存を行います。
      */
     @Override
-    public void onDisable() {
-        config.save();
+    public void onPluginStop() {
         Optional.ofNullable(saveManager).ifPresent(PlayerDataManager::close);
         getLogger().info("FishingPlugin has been disabled!");
     }
@@ -66,7 +67,7 @@ public class FishingPlugin extends JavaPlugin {
      * レベルアップ時にはメッセージを送信します。
      *
      * @param playerUUID プレイヤーのUUID
-     * @param exp 追加する経験値
+     * @param exp        追加する経験値
      */
     public void addExperience(UUID playerUUID, int exp) {
         var playerData = playerDataMap().get(playerUUID);
@@ -77,7 +78,7 @@ public class FishingPlugin extends JavaPlugin {
             currentExp -= getRequiredExp(currentLevel);
             currentLevel++;
             var player = Bukkit.getPlayer(playerUUID);
-            if(player == null) return;
+            if (player == null) return;
             player.sendMessage(Component
                     .text("釣りレベルが上がりました！ 現在のレベル: ")
                     .append(Component.text(currentLevel))
@@ -129,23 +130,15 @@ public class FishingPlugin extends JavaPlugin {
      * プレイヤーデータを新規作成します。
      * 既にデータが存在する場合は警告を出力します。
      *
-     * @param name プレイヤーの名前
+     * @param name       プレイヤーの名前
      * @param playerUUID プレイヤーのUUID
      */
     public void createPlayerData(String name, UUID playerUUID) {
         if (!playerDataMap().containsKey(playerUUID)) {
-            var newData = new PlayerData(name,1, 0);
+            var newData = new PlayerData(name, 1, 0);
             saveManager.setPlayerData(playerUUID, newData);
         } else {
             getLogger().warning("Player data for " + playerUUID + " already exists.");
         }
-    }
-
-
-    public void updatePlayerTableVersion() {
-    }
-
-    public void updateCountTableVersion() {
-        
     }
 }
