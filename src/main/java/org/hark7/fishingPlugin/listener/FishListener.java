@@ -281,8 +281,8 @@ public class FishListener implements Listener {
         var rand = new Random();
         var enchantment = enchantments[rand.nextInt(enchantments.length)];
         var level = 1;
-        if (2 < enchantment.getMaxLevel()) level += rand.nextInt(Math.min(enchantment.getMaxLevel(), playerLevel / 5));
-        else level += rand.nextInt(Math.min(enchantment.getMaxLevel(), playerLevel / 10));
+        if (2 < enchantment.getMaxLevel()) level += rand.nextInt(Math.min(enchantment.getMaxLevel(), playerLevel / 5) + 1);
+        else level += rand.nextInt(Math.min(enchantment.getMaxLevel(), playerLevel / 10) + 1);
         return new ItemFish(Material.ENCHANTED_BOOK, Rarity.LEGENDARY, 0,
                 new EnchantmentValue(enchantment, level));
     }
