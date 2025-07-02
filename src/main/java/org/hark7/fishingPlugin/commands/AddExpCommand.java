@@ -1,56 +1,90 @@
 package org.hark7.fishingPlugin.commands;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.hark7.fishingPlugin.FishingPlugin;
-import org.jetbrains.annotations.NotNull;
+import org.hark7.fishingPlugin.database.PlayerDataManager;
+import org.mineacademy.fo.command.SimpleSubCommand;
+import org.mineacademy.fo.settings.Lang;
 
-public class AddExpCommand implements CommandExecutor {
-    private final FishingPlugin plugin;
+public class AddExpCommand extends SimpleSubCommand {
+    private final PlayerDataManager manager;
 
-    public AddExpCommand(FishingPlugin plugin) {
-        this.plugin = plugin;
+    protected AddExpCommand(PlayerDataManager manager) {
+        super("addexp");
+        this.manager = manager;
+        setPermission(Lang.of("Commands.AddExp.Permission"));
+        this.setMinArguments(1);
+        this.setDescription(Lang.of("Commands.addExp.Description"));
     }
 
-    @Override
-    public boolean onCommand(CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    protected String[] getMultilineUsageMessage() {
+        return Lang.ofArray(Lang.of("Commands.addExp.Usage"));
+    }
+
+    protected void onCommand() {
         if (!sender.isOp()) {
-            sender.sendMessage(ChatColor.RED + "このコマンドはOP権限が必要です。");
-            return true;
+            tell(Lang.of("Commands.Invalid.PermissionMessage"));
+            return;
         }
 
         if (args.length != 2) {
-            sender.sendMessage(ChatColor.RED + "使用方法: /addexp <プレイヤー名> <経験値>");
-            return true;
+            tell(Lang.of("Commands.addExp.Usage"));
+            return;
         }
 
-        Player target = Bukkit.getPlayer(args[0]);
+        var target = Bukkit.getPlayer(args[0]);
         if (target == null) {
-            sender.sendMessage(ChatColor.RED + "指定されたプレイヤーが見つかりません。");
-            return true;
+            tell(Lang.of("Commands.Invalid.PlayerNotFound"));
+            return;
         }
 
         int expToAdd;
         try {
             expToAdd = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
-            sender.sendMessage(ChatColor.RED + "経験値は数値で指定してください。");
-            return true;
+            tell(Lang.of("Commands.Invalid.NotANumber"));
+            return;
         }
 
         if (expToAdd <= 0) {
-            sender.sendMessage(ChatColor.RED + "経験値は正の数で指定してください。");
-            return true;
+            tell(Lang.of("Commands.Invalid.NegativeOrZero"));
+            return;
         }
 
-        plugin.addExperience(target.getUniqueId(), expToAdd);
+        addExperience(target, expToAdd);
         sender.sendMessage(ChatColor.GREEN + target.getName() + "に" + expToAdd + "の経験値を追加しました。");
         target.sendMessage(ChatColor.GREEN + "管理者により" + expToAdd + "の経験値が追加されました。");
+    }
 
-        return true;
+    /**
+     * プレイヤーの経験値を追加します。
+     * レベルアップ時にはメッセージを送信します。
+     *
+     * @param player プレイヤー
+     * @param exp    追加する経験値
+     */
+    public void addExperience(Player player, int exp) {
+        var playerUUID = player.getUniqueId();
+        var playerData = manager.playerDataMap().get(playerUUID);
+        int currentExp = playerData.exp() + exp;
+        int currentLevel = playerData.level();
+
+        while (currentExp >= getRequiredExp(currentLevel)) {
+            currentExp -= getRequiredExp(currentLevel);
+            currentLevel++;
+
+            player.sendMessage(Component
+                    .text("釣りレベルが上がりました！ 現在のレベル: ")
+                    .append(Component.text(currentLevel))
+                    .color(NamedTextColor.GOLD));
+        }
+        manager.setPlayerExp(playerUUID, currentExp);
+        manager.setPlayerLevel(playerUUID, currentLevel);
+    }
+    public int getRequiredExp(int level) {
+        return 100 * level * level;
     }
 }

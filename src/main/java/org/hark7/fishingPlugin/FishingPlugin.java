@@ -61,33 +61,6 @@ public class FishingPlugin extends SimplePlugin {
         getLogger().info("FishingPlugin has been disabled!");
     }
 
-
-    /**
-     * プレイヤーの経験値を追加します。
-     * レベルアップ時にはメッセージを送信します。
-     *
-     * @param playerUUID プレイヤーのUUID
-     * @param exp        追加する経験値
-     */
-    public void addExperience(UUID playerUUID, int exp) {
-        var playerData = playerDataMap().get(playerUUID);
-        int currentExp = playerData.exp() + exp;
-        int currentLevel = playerData.level();
-
-        while (currentExp >= getRequiredExp(currentLevel)) {
-            currentExp -= getRequiredExp(currentLevel);
-            currentLevel++;
-            var player = Bukkit.getPlayer(playerUUID);
-            if (player == null) return;
-            player.sendMessage(Component
-                    .text("釣りレベルが上がりました！ 現在のレベル: ")
-                    .append(Component.text(currentLevel))
-                    .color(NamedTextColor.GOLD));
-        }
-        saveManager.setPlayerExp(playerUUID, currentExp);
-        saveManager.setPlayerLevel(playerUUID, currentLevel);
-    }
-
     public void addCount(UUID playerUUID, Fishable.Rarity rarity) {
         var playerData = playerDataMap().get(playerUUID);
         int currentCount = playerData.count(rarity) + 1;
@@ -123,7 +96,7 @@ public class FishingPlugin extends SimplePlugin {
     }
 
     public Map<UUID, PlayerData> playerDataMap() {
-        return saveManager.getPlayerDataMap();
+        return saveManager.playerDataMap();
     }
 
     /**

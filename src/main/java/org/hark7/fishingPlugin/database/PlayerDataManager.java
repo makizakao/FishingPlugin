@@ -143,7 +143,7 @@ public class PlayerDataManager {
         return null;
     }
 
-    public synchronized Map<UUID, PlayerData> getPlayerDataMap() {
+    public synchronized Map<UUID, PlayerData> playerDataMap() {
         Map<UUID, PlayerData> playerDataMap = new ConcurrentHashMap<>();
         String sql = "SELECT p.uuid, p.name, p.level, p.exp, " +
                 "c.scrap, c.common, c.uncommon, c.rare, c.epic, c.legendary " +
