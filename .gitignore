@@ -4,7 +4,7 @@ build/
 target/
 # Cache of project
 .gradletasknamecache
-
+FishingPlugin.iml
 # Eclipse Gradle plugin generated files
 # Eclipse Core
 .project
