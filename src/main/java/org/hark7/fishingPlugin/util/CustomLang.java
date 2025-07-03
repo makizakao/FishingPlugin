@@ -1,5 +1,6 @@
 package org.hark7.fishingPlugin.util;
 
+import net.kyori.adventure.text.TextReplacementConfig;
 import org.mineacademy.fo.settings.Lang;
 
 public class CustomLang {
