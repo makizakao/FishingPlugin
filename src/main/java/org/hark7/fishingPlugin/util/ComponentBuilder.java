@@ -6,19 +6,23 @@ import net.kyori.adventure.text.TextReplacementConfig;
 public class ComponentBuilder {
     private Component content;
 
-    public ComponentBuilder(Component content) {
+    private ComponentBuilder(Component content) {
         this.content = content;
+    }
+
+    public static ComponentBuilder builder(Component content) {
+        return new ComponentBuilder(content);
     }
     
     public Component build() {
         return content;
     }
     
-    public ComponentBuilder replace(String src, String dst) {
+    public <T> ComponentBuilder replace(String src, T dst) {
         content = content
                 .replaceText(TextReplacementConfig.builder()
                 .matchLiteral(src)
-                .replacement(dst)
+                .replacement(dst.toString())
                 .build());
         return this;
     }

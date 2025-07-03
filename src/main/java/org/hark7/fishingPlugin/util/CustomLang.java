@@ -1,5 +1,6 @@
 package org.hark7.fishingPlugin.util;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import org.mineacademy.fo.settings.Lang;
 
@@ -9,7 +10,7 @@ public class CustomLang {
     }
 
     public static ComponentBuilder ofComponent(String path, String lang) {
-        return new ComponentBuilder(Lang.of(path));
+        return null;
     }
 }
 

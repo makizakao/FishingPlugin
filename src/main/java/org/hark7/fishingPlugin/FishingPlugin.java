@@ -1,17 +1,21 @@
 package org.hark7.fishingPlugin;
 
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.hark7.fishingPlugin.commands.*;
+import org.hark7.fishingPlugin.commands.group.FishCommandGroup;
 import org.hark7.fishingPlugin.database.DatabaseVersionManager;
+import org.hark7.fishingPlugin.database.FishExpManager;
 import org.hark7.fishingPlugin.listener.FishListener;
 import org.hark7.fishingPlugin.listener.PlayerPreLoginListener;
 import org.hark7.fishingPlugin.listener.VillagerAcquireTradeListener;
 import org.hark7.fishingPlugin.database.PlayerData;
 import org.hark7.fishingPlugin.database.PlayerDataManager;
 import org.hark7.fishingPlugin.type.Fishable;
+import org.mineacademy.fo.command.SimpleCommandGroup;
 import org.mineacademy.fo.plugin.SimplePlugin;
 
 import java.util.List;
@@ -21,19 +25,21 @@ import java.util.UUID;
 
 public class FishingPlugin extends SimplePlugin {
     private final FishTable fishTable = new FishTable();
-    private PlayerDataManager saveManager;
-
+    private final PlayerDataManager saveManager = new PlayerDataManager(this);
+    private final FishExpManager expManager = new FishExpManager(saveManager);
+    @Getter
+    private final SimpleCommandGroup commandGroup = new FishCommandGroup(expManager);
     /**
      * プラグインの有効化時に呼び出されるメソッド
      * イベントリスナーの登録、設定ファイルの読み込み、レシピの登録を行います。
      */
     @Override
     public void onPluginStart() {
-        saveManager = new PlayerDataManager(this);
         var dbVersionManager = new DatabaseVersionManager(this, saveManager);
+        var fishExpManager = new FishExpManager(saveManager);
         dbVersionManager.checkAndMigrate();
         fishTable.initializeFishList();
-        Bukkit.getPluginManager().registerEvents(new FishListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new FishListener(this, fishExpManager), this);
         Bukkit.getPluginManager().registerEvents(new VillagerAcquireTradeListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerPreLoginListener(this), this);
         Recipes.register(this);
@@ -44,8 +50,6 @@ public class FishingPlugin extends SimplePlugin {
                 .ifPresent(c -> c.setExecutor(new FishTopCommand(this)));
         Optional.ofNullable(getCommand("upgradepole"))
                 .ifPresent(c -> c.setExecutor(new UpgradePoleCommand(this)));
-        Optional.ofNullable(getCommand("addexp"))
-                .ifPresent(c -> c.setExecutor(new AddExpCommand(this)));
         Optional.ofNullable(getCommand("resetlevel"))
                 .ifPresent(c -> c.setExecutor(new ResetLevelCommand(this, saveManager)));
         getLogger().info("FishingPlugin has been enabled!");

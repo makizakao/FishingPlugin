@@ -1,7 +1,5 @@
 package org.hark7.fishingPlugin.database;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.mineacademy.fo.settings.Lang;
 
@@ -28,12 +26,9 @@ public class FishExpManager {
         while (currentExp >= getRequiredExp(currentLevel)) {
             currentExp -= getRequiredExp(currentLevel);
             currentLevel++;
-
-            Lang.ofComponent("FishingLevel.LevelUp", );
-            player.sendMessage(Component
-                    .text("釣りレベルが上がりました！ 現在のレベル: ")
-                    .append(Component.text(currentLevel))
-                    .color(NamedTextColor.GOLD));
+            var message = Lang.ofComponent("FishingLevel.LevelUp", "en")
+                    .replace("{level}", String.valueOf(currentLevel));
+            message.send(player);
         }
         manager.setPlayerExp(playerUUID, currentExp);
         manager.setPlayerLevel(playerUUID, currentLevel);

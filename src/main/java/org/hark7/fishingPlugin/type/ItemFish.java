@@ -15,7 +15,7 @@ public class ItemFish implements MaterialFish {
     private final Rarity rarity;
     public final Material material;
     private final int damage;
-    private final EnchantmentValue[] enchantments;
+    private final EnchantmentLevelPair[] enchantments;
 
     /**
      * 魚のコンストラクタ（名前と素材のみ）
@@ -24,7 +24,7 @@ public class ItemFish implements MaterialFish {
      * @param rarity       レアリティ
      * @param enchantments 付与されるエンチャント
      */
-    public ItemFish(Material material, Rarity rarity, EnchantmentValue... enchantments) {
+    public ItemFish(Material material, Rarity rarity, EnchantmentLevelPair... enchantments) {
         this.name = Optional.ofNullable(material.getItemTranslationKey())
                 .map(Component::translatable)
                 .map(c -> (Component) c)
@@ -43,7 +43,7 @@ public class ItemFish implements MaterialFish {
      * @param damage       ダメージ値
      * @param enchantments 付与されるエンチャント
      */
-    public ItemFish(Material material, Rarity rarity, int damage, EnchantmentValue... enchantments) {
+    public ItemFish(Material material, Rarity rarity, int damage, EnchantmentLevelPair... enchantments) {
         this.name = Component.translatable(material.translationKey());
         this.material = material;
         this.rarity = rarity;
@@ -58,7 +58,7 @@ public class ItemFish implements MaterialFish {
             List<String> lore = new ArrayList<>();
             lore.add(rarity.chatColor() + "レア度: " + rarity.name());
             meta.setLore(lore);
-            for (EnchantmentValue enchantment : enchantments) {
+            for (EnchantmentLevelPair enchantment : enchantments) {
                 meta.addEnchant(enchantment.enchantment(), enchantment.level(), true);
             }
             //meta.setCustomModelData(1001);

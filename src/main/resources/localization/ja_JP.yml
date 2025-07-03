@@ -12,11 +12,13 @@ Commands:
     Usage:
       - "使用方法: /fish addexp <プレイヤー名> <経験値>"
     Permission: "fishingplugin.op"
+    Sender: "§6{player}に{expValue}の経験値を追加しました。"
+    Target: "§6管理者から{expValue}の経験値を追加されました。"
   Invalid:
-    PermissionMessage: "&cこのコマンドを使用する権限がありません。"
-    PlayerNotFound: "&c指定されたプレイヤーが見つかりません。"
-    NotANumber: "&c経験値は数値で指定してください。"
-    NegativeOrZero: "&c経験値は正の値で指定してください。"
+    PermissionMessage: "§cこのコマンドを使用する権限がありません。"
+    PlayerNotFound: "§c指定されたプレイヤーが見つかりません。"
+    NotANumber: "§c経験値は数値で指定してください。"
+    NegativeOrZero: "§c経験値は正の値で指定してください。"
 
 FishingLevel:
-  LevelUp: "&6釣りレベルが{level}に上がりました！"
+  LevelUp: "§6釣りレベルが{level}に上がりました！"

@@ -57,6 +57,6 @@ public interface Fishable {
         }
     }
 
-    record EnchantmentValue(Enchantment enchantment, int level) {
+    record EnchantmentLevelPair(Enchantment enchantment, int level) {
     }
 }
