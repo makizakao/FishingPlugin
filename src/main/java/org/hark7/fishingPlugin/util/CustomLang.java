@@ -11,13 +11,11 @@ import org.mineacademy.fo.settings.SimpleLocalization;
 import org.mineacademy.fo.settings.YamlConfig;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.jar.JarFile;
 
 public class CustomLang {
+    private static final String defaultLanguage = Settings.Language.defaultLanguage;
     private static final String[] languages = Settings.Language.languages;
     private static final Map<String, YamlConfig> languageFiles = new HashMap<>();
 
@@ -59,7 +57,8 @@ public class CustomLang {
 
 
     public static String[] ofArray(String path, String lang) {
-        return languageFiles.get(lang).getIsInList(path, String.class).getList().toArray(new String[0]);
+        return Optional.ofNullable(languageFiles.get(lang)).orElse(languageFiles.get(defaultLanguage))
+                .getIsInList(path, String.class).getList().toArray(new String[0]);
     }
 
     public static String[] ofArray(String path) {
@@ -120,7 +119,8 @@ public class CustomLang {
     }
 
     private static String getStringStrict(String path, String lang) {
-        String key = languageFiles.get(lang).getString(path);
+        String key = Optional.ofNullable(languageFiles.get(lang))
+                .orElse(languageFiles.get(defaultLanguage)).getString(path);
         Valid.checkNotNull(key, "Missing localization key");
         return key;
     }
