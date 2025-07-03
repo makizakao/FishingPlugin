@@ -1,12 +1,8 @@
 package org.hark7.fishingPlugin;
 
-import lombok.Getter;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.hark7.fishingPlugin.commands.*;
-import org.hark7.fishingPlugin.commands.group.FishCommandGroup;
 import org.hark7.fishingPlugin.database.DatabaseVersionManager;
 import org.hark7.fishingPlugin.database.FishExpManager;
 import org.hark7.fishingPlugin.listener.FishListener;
@@ -15,7 +11,7 @@ import org.hark7.fishingPlugin.listener.VillagerAcquireTradeListener;
 import org.hark7.fishingPlugin.database.PlayerData;
 import org.hark7.fishingPlugin.database.PlayerDataManager;
 import org.hark7.fishingPlugin.type.Fishable;
-import org.mineacademy.fo.command.SimpleCommandGroup;
+import org.hark7.fishingPlugin.util.CustomLang;
 import org.mineacademy.fo.plugin.SimplePlugin;
 
 import java.util.List;
@@ -26,9 +22,7 @@ import java.util.UUID;
 public class FishingPlugin extends SimplePlugin {
     private final FishTable fishTable = new FishTable();
     private final PlayerDataManager saveManager = new PlayerDataManager(this);
-    private final FishExpManager expManager = new FishExpManager(saveManager);
-    @Getter
-    private final SimpleCommandGroup commandGroup = new FishCommandGroup(expManager);
+
     /**
      * プラグインの有効化時に呼び出されるメソッド
      * イベントリスナーの登録、設定ファイルの読み込み、レシピの登録を行います。
@@ -39,10 +33,13 @@ public class FishingPlugin extends SimplePlugin {
         var fishExpManager = new FishExpManager(saveManager);
         dbVersionManager.checkAndMigrate();
         fishTable.initializeFishList();
+        CustomLang.init(this, getFile());
         Bukkit.getPluginManager().registerEvents(new FishListener(this, fishExpManager), this);
         Bukkit.getPluginManager().registerEvents(new VillagerAcquireTradeListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerPreLoginListener(this), this);
         Recipes.register(this);
+
+        registerCommand(new FishCommand(fishExpManager));
         // コマンドの追加
         Optional.ofNullable(getCommand("fishstats"))
                 .ifPresent(c -> c.setExecutor(new FishStatsCommand(this)));
@@ -61,7 +58,7 @@ public class FishingPlugin extends SimplePlugin {
      */
     @Override
     public void onPluginStop() {
-        Optional.ofNullable(saveManager).ifPresent(PlayerDataManager::close);
+        saveManager.close();
         getLogger().info("FishingPlugin has been disabled!");
     }
 

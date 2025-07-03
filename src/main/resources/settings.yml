@@ -1,5 +1,8 @@
 # Locale settings for the application
-Locale: en
+Language:
+  Default: ja_JP
+  Supported:
+    - ja_JP
 
 # Database connection settings
 # Don't modify values in DatabaseVersion section

@@ -1,7 +1,6 @@
 package org.hark7.fishingPlugin.type;
 
 import net.kyori.adventure.text.Component;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 public class EntityFish implements Fishable {

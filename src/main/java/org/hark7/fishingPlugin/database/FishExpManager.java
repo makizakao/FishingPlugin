@@ -1,7 +1,7 @@
 package org.hark7.fishingPlugin.database;
 
 import org.bukkit.entity.Player;
-import org.mineacademy.fo.settings.Lang;
+import org.hark7.fishingPlugin.util.CustomLang;
 
 public class FishExpManager {
     private final PlayerDataManager manager;
@@ -20,19 +20,22 @@ public class FishExpManager {
     public void addExperience(Player player, int exp) {
         var playerUUID = player.getUniqueId();
         var playerData = manager.playerDataMap().get(playerUUID);
+        var lang = player.locale().toLanguageTag();
         int currentExp = playerData.exp() + exp;
         int currentLevel = playerData.level();
 
         while (currentExp >= getRequiredExp(currentLevel)) {
             currentExp -= getRequiredExp(currentLevel);
             currentLevel++;
-            var message = Lang.ofComponent("FishingLevel.LevelUp", "en")
-                    .replace("{level}", String.valueOf(currentLevel));
-            message.send(player);
+
+            CustomLang.ofComponent("FishingLevel.LevelUp", lang)
+                    .replace("{level}", String.valueOf(currentLevel))
+                    .send(player);
         }
         manager.setPlayerExp(playerUUID, currentExp);
         manager.setPlayerLevel(playerUUID, currentLevel);
     }
+
     public int getRequiredExp(int level) {
         return 100 * level * level;
     }
