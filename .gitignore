@@ -2,6 +2,7 @@
 .idea/
 build/
 target/
+remote_server/
 # Cache of project
 .gradletasknamecache
 FishingPlugin.iml
