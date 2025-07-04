@@ -3,6 +3,7 @@ package org.hark7.fishingPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.hark7.fishingPlugin.commands.*;
+import org.hark7.fishingPlugin.commands.handler.UpgradePoleCommand;
 import org.hark7.fishingPlugin.database.DatabaseVersionManager;
 import org.hark7.fishingPlugin.database.FishExpManager;
 import org.hark7.fishingPlugin.listener.FishListener;
@@ -39,16 +40,8 @@ public class FishingPlugin extends SimplePlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerPreLoginListener(this), this);
         Recipes.register(this);
 
-        registerCommand(new FishCommand(fishExpManager));
+        registerCommand(new FishCommand(saveManager, fishExpManager));
         // コマンドの追加
-        Optional.ofNullable(getCommand("fishstats"))
-                .ifPresent(c -> c.setExecutor(new FishStatsCommand(this)));
-        Optional.ofNullable(getCommand("fishtop"))
-                .ifPresent(c -> c.setExecutor(new FishTopCommand(this)));
-        Optional.ofNullable(getCommand("upgradepole"))
-                .ifPresent(c -> c.setExecutor(new UpgradePoleCommand(this)));
-        Optional.ofNullable(getCommand("resetlevel"))
-                .ifPresent(c -> c.setExecutor(new ResetLevelCommand(this, saveManager)));
         getLogger().info("FishingPlugin has been enabled!");
     }
 

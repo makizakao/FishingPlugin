@@ -2,28 +2,80 @@ Commands:
   stats:
     Description: "プレイヤーの統計を表示します。"
     Usage:
-      - "/fish stats"
+      - "/fish stats [all]"
+    Title: "§e===== 釣り統計 ====="
+    Level: "§aレベル: {level}"
+    Experience: "§a経験値: {exp}/{requiredExp}"
+    Total: "§a累計: {total}匹"
+    Scrap: "§aSCRAP: {total}匹"
+    Common: "§aCOMMON: {total}匹"
+    Uncommon: "§aUNCOMMON: {total}匹"
+    Rare: "§aRARE: {total}匹"
+    Epic: "§aEPIC: {total}匹"
+    Legendary: "§aLEGENDARY: {total}匹"
+
   top:
     Description: "釣りランキングを表示します。"
     Usage:
       - "/fish top <type>"
+    Title: "§e===== 釣りランキング | {title} ====="
+    level:
+      Title: "レベル"
+      Content: "§a{rank}位: {player} - レベル {level}"
+    total:
+      Title: "累計"
+      Content: "§a{rank}位: {player} - {total}匹"
+    scrap:
+      Title: "SCRAP"
+      Content: "§a{rank}位: {player} - {total}匹"
+    common:
+      Title: "COMMON"
+      Content: "§a{rank}位: {player} - {total}匹"
+    uncommon:
+      Title: "UNCOMMON"
+      Content: "§a{rank}位: {player} - {total}匹"
+    rare:
+      Title: "RARE"
+      Content: "§a{rank}位: {player} - {total}匹"
+    epic:
+      Title: "EPIC"
+      Content: "§a{rank}位: {player} - {total}匹"
+    legendary:
+      Title: "LEGENDARY"
+      Content: "§a{rank}位: {player} - {total}匹"
+
   addexp:
     Description: "プレイヤーに釣りの経験値を追加します（OP専用）。"
     Usage:
-      - "使用方法: /fish addexp <プレイヤー名> <経験値>"
+      - "/fish addexp <プレイヤー名> <経験値>"
     Permission: "fishingplugin.op"
-    Sender: "§6{player}に{expValue}の経験値を追加しました。"
-    Target: "§6管理者から{expValue}の経験値を追加されました。"
+    Sender: "§a{player}に{expValue}の経験値を追加しました。"
+    Target: "§a管理者から{expValue}の経験値を追加されました。"
   Usage:
-    - "使用方法: /fish <コマンド> [引数]"
+    - "/fish <コマンド> [引数]"
     - "プレイヤーの統計を表示：/fish stats"
     - "釣りランキングを表示：/fish top <type>"
     - "経験値を追加：/fish addexp <プレイヤー名> <経験値>"
+
+  resetlevel:
+    Usage:
+      - "/fish resetlevel <プレイヤー名|@a|all>"
+    Player: "§a{player}の釣りレベルをリセットしました。"
+    All: "§a全てのプレイヤーの釣りレベルをリセットしました。"
+
+  upgradepole:
+    Description: "釣り竿をアップグレードします。"
+    Usage:
+      - "/fish upgradepole"
+    Success: "§a釣り竿をアップグレードしました！"
+
   Invalid:
     PermissionMessage: "§cこのコマンドを使用する権限がありません。"
     PlayerNotFound: "§c指定されたプレイヤーが見つかりません。"
     NotANumber: "§c経験値は数値で指定してください。"
     NegativeOrZero: "§c経験値は正の値で指定してください。"
+    NoHandItem: "§c{item}を手に持って使用してください。"
+    NotEnoughFishingLevel: "§c釣りレベルが足りません。必要レベル: {level}"
 
 FishingLevel:
   LevelUp: "§6釣りレベルが{level}に上がりました！"

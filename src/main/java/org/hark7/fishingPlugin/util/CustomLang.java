@@ -1,5 +1,6 @@
 package org.hark7.fishingPlugin.util;
 
+import net.kyori.adventure.text.Component;
 import org.hark7.fishingPlugin.FishingPlugin;
 import org.hark7.fishingPlugin.Settings;
 import org.mineacademy.fo.Common;
@@ -65,12 +66,12 @@ public class CustomLang {
         return ofArray(path, Settings.Language.defaultLanguage);
     }
 
-    public static List<SimpleComponent> ofComponentList(String path, String lang, Object... variables) {
+    public static List<SimpleComponent> ofSimpleComponentList(String path, String lang, Object... variables) {
         return Common.convert(ofList(path, lang, variables), SimpleComponent::of);
     }
 
-    public static List<SimpleComponent> ofComponentList(String path, Object... variables) {
-        return ofComponentList(path, Settings.Language.defaultLanguage, variables);
+    public static List<SimpleComponent> ofSimpleComponentList(String path, Object... variables) {
+        return ofSimpleComponentList(path, Settings.Language.defaultLanguage, variables);
     }
 
     public static List<String> ofList(String path, String lang, Object... variables) {
@@ -85,11 +86,19 @@ public class CustomLang {
         return of(path, lang, variables).split("\n");
     }
 
-    public static SimpleComponent ofComponent(String path, String lang, Object... variables) {
+    public static SimpleComponent ofSimpleComponent(String path, String lang, Object... variables) {
         return SimpleComponent.of(of(path, lang, variables));
     }
 
-    public static SimpleComponent ofComponent(String path, Object... variables) {
+    public static SimpleComponent ofSimpleComponent(String path, Object... variables) {
+        return ofSimpleComponent(path, Settings.Language.defaultLanguage, variables);
+    }
+
+    public static Component ofComponent(String path, String lang, Object... variables) {
+        return Component.text(of(path, lang, variables));
+    }
+
+    public static Component ofComponent(String path, Object... variables) {
         return ofComponent(path, Settings.Language.defaultLanguage, variables);
     }
 

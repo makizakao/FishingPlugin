@@ -28,7 +28,7 @@ public class FishExpManager {
             currentExp -= getRequiredExp(currentLevel);
             currentLevel++;
 
-            CustomLang.ofComponent("FishingLevel.LevelUp", lang)
+            CustomLang.ofSimpleComponent("FishingLevel.LevelUp", lang)
                     .replace("{level}", String.valueOf(currentLevel))
                     .send(player);
         }
