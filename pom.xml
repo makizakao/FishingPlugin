@@ -93,7 +93,7 @@
                     <relocations>
                         <relocation>
                             <pattern>org.mineacademy.fo</pattern>
-                            <shadedPattern>your.plugin.main.package.lib</shadedPattern>
+                            <shadedPattern>org.hark7.fishingPlugin.lib</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>

@@ -15,7 +15,7 @@ import java.util.UUID;
 public class TopLevelCommand implements ICommandHandler {
     private final PlayerDataManager manager;
 
-    public  TopLevelCommand(PlayerDataManager manager) {
+    public TopLevelCommand(PlayerDataManager manager) {
         this.manager = manager;
     }
 

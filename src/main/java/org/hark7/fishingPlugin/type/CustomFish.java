@@ -1,11 +1,14 @@
 package org.hark7.fishingPlugin.type;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.hark7.fishingPlugin.util.CustomLang;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +22,7 @@ public class CustomFish implements MaterialFish {
     public final Component name;
     private final Rarity rarity;
     private final Material material;
-    private final String description;
+    private final Component description;
 
     /**
      * 魚のコンストラクタ
@@ -29,7 +32,11 @@ public class CustomFish implements MaterialFish {
      * @param description 魚の説明
      * @param rarity      魚のレアリティ
      */
-    public CustomFish(String name, Material material, String description, Rarity rarity) {
+    public CustomFish(String name, Material material, Component description, Rarity rarity) {
+        if (name == null) throw new NullPointerException();      // 名前がnullの場合は例外を投げる
+        if (material == null) throw new NullPointerException();  // アイテムがnullの場合は例外を投げる
+
+        if (description == null) description = Component.empty(); // 説明がnullの場合は空のコンポーネントを使用
         this.name = Component.text(name);
         this.material = material;
         this.description = description;
@@ -39,15 +46,17 @@ public class CustomFish implements MaterialFish {
     public ItemStack createItemStack() {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta meta = itemStack.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(PlainTextComponentSerializer.plainText().serialize(name));
-            List<String> lore = new ArrayList<>();
-            Optional.ofNullable(description).ifPresent(d -> lore.add(ChatColor.GRAY + d));
-            lore.add(rarity.chatColor() + "レア度: " + rarity.name());
-            meta.setLore(lore);
-            //meta.setCustomModelData(1001);
-            itemStack.setItemMeta(meta);
-        }
+        meta.displayName(name);
+        var lore = Optional.ofNullable(meta.lore()).orElse(new ArrayList<>());
+        lore.add(description);
+        lore.add(CustomLang.ofComponent("Items.Rarity").replaceText(TextReplacementConfig.builder()
+                        .matchLiteral("{rarity}")
+                        .replacement(Component.text(rarity.name(), rarity.textColor()))
+                        .build())
+                .color(NamedTextColor.WHITE));
+        meta.lore(lore);
+        //meta.setCustomModelData(1001);
+        itemStack.setItemMeta(meta);
         return itemStack;
     }
 

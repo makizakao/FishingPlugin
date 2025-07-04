@@ -1,13 +1,13 @@
-package org.hark7.fishingPlugin.commands.handler;
+package org.hark7.fishingPlugin.commands.handler.top;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.hark7.fishingPlugin.commands.handler.ICommandHandler;
 import org.hark7.fishingPlugin.database.PlayerDataManager;
 import org.hark7.fishingPlugin.util.CustomLang;
 
@@ -32,7 +32,7 @@ public class UpgradePoleCommand implements ICommandHandler {
         if (fishingRod.getType() != Material.FISHING_ROD) {
             player.sendMessage(CustomLang.ofComponent("Commands.upgradepole.InvalidItem", lang)
                     .replaceText(TextReplacementConfig.builder()
-                            .match("{item}")
+                            .matchLiteral("{item}")
                             .replacement(Component.translatable(Material.FISHING_ROD.translationKey()))
                             .build()));
             return;

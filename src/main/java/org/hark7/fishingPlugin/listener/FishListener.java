@@ -83,9 +83,9 @@ public class FishListener implements Listener {
             plugin.addCount(playerUUID, caughtFish.rarity());
 
             player.sendMessage(Component
-                    .text("あなたは")
+                    .text("あなたは ")
                     .append(caughtFish.name().color(caughtFish.rarity().textColor()))
-                    .append(Component.text("を釣りあげました！")));
+                    .append(Component.text(" を釣りあげました！")));
             player.sendMessage(Component
                     .text("経験値を獲得しました: ")
                     .append(Component.text(totalExp))

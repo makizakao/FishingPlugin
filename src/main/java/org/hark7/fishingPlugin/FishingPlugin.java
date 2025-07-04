@@ -3,7 +3,6 @@ package org.hark7.fishingPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.hark7.fishingPlugin.commands.*;
-import org.hark7.fishingPlugin.commands.handler.UpgradePoleCommand;
 import org.hark7.fishingPlugin.database.DatabaseVersionManager;
 import org.hark7.fishingPlugin.database.FishExpManager;
 import org.hark7.fishingPlugin.listener.FishListener;

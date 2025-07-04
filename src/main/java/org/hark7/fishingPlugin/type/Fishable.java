@@ -20,23 +20,20 @@ public interface Fishable {
     }
 
     enum Rarity {
-        SCRAP(1, 1, ChatColor.GRAY, NamedTextColor.GRAY),
-        COMMON(10, 2, ChatColor.WHITE, NamedTextColor.WHITE),
-        UNCOMMON(20, 4, ChatColor.GREEN, NamedTextColor.GREEN),
-        RARE(40, 6, ChatColor.BLUE, NamedTextColor.BLUE),
-        EPIC(100, 10, ChatColor.DARK_PURPLE, NamedTextColor.DARK_PURPLE),
-        LEGENDARY(250, 15, ChatColor.GOLD, NamedTextColor.GOLD),
-        ;
+        SCRAP(1, 1, NamedTextColor.GRAY),
+        COMMON(10, 2, NamedTextColor.WHITE),
+        UNCOMMON(20, 4, NamedTextColor.GREEN),
+        RARE(40, 6, NamedTextColor.BLUE),
+        EPIC(100, 10, NamedTextColor.DARK_PURPLE),
+        LEGENDARY(250, 15, NamedTextColor.GOLD);
 
         private final int expValue;
         private final int pExpValue;
-        private final ChatColor chatColor;
         private final TextColor textColor;
 
-        Rarity(int expValue, int pExpValue, ChatColor chatColor, TextColor textColor) {
+        Rarity(int expValue, int pExpValue, TextColor textColor) {
             this.expValue = expValue;
             this.pExpValue = pExpValue;
-            this.chatColor = chatColor;
             this.textColor = textColor;
         }
 
@@ -46,10 +43,6 @@ public interface Fishable {
 
         public int exp() {
             return expValue;
-        }
-
-        public ChatColor chatColor() {
-            return chatColor;
         }
 
         public TextColor textColor() {

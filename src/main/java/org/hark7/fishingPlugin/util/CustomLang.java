@@ -32,7 +32,7 @@ public class CustomLang {
     private static void tryCreateLanguageFiles(FishingPlugin plugin, File pluginFile) {
         var folder = "localization";
         var destDir = new File(plugin.getDataFolder(), folder);
-        if(destDir.exists()) {
+        if (destDir.exists()) {
             plugin.getLogger().info("Localization folder already exists.");
         } else {
             destDir.mkdirs();

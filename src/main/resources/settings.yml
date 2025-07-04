@@ -1,11 +1,12 @@
-# Locale settings for the application
+# Plugin locale settings
 Language:
   Default: "ja-JP"
   Supported:
     - "ja-JP"
 
 # Database connection settings
-# Don't modify values in DatabaseVersion section
+# Do not modify values in DatabaseVersion section.
+# Only this plugin is allowed to change this section.
 DatabaseVersion:
   PlayersTableVersion: 1
   CountsTableVersion: 1

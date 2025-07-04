@@ -1,5 +1,7 @@
 package org.hark7.fishingPlugin;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.hark7.fishingPlugin.type.CustomFish;
@@ -118,7 +120,7 @@ public class FishTable {
     }
 
     private void addFish(String name, String description, Material material, Rarity rarity) {
-        fishList.add(new CustomFish(name, material, description, rarity));
+        fishList.add(new CustomFish(name, material, Component.text(description).color(NamedTextColor.GRAY), rarity));
     }
 
     private void addItem(Material material, Rarity rarity) {

@@ -1,3 +1,5 @@
+# コマンドに関するローカライズ設定
+# 削除した場合、正常に動作しない可能性があります。
 Commands:
   stats:
     Description: "プレイヤーの統計を表示します。"
@@ -77,5 +79,11 @@ Commands:
     NoHandItem: "§c{item}を手に持って使用してください。"
     NotEnoughFishingLevel: "§c釣りレベルが足りません。必要レベル: {level}"
 
+# 経験値に関するローカライズ設定
+# 削除した場合、正常に動作しない可能性があります。
 FishingLevel:
   LevelUp: "§6釣りレベルが{level}に上がりました！"
+
+Items:
+  Rarity: "レア度: {rarity}"
+
