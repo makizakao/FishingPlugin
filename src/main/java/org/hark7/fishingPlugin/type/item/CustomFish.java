@@ -1,17 +1,14 @@
-package org.hark7.fishingPlugin.type;
+package org.hark7.fishingPlugin.type.item;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.hark7.fishingPlugin.util.CustomLang;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -43,8 +40,8 @@ public class CustomFish implements MaterialFish {
         this.rarity = rarity;
     }
 
-    public ItemStack createItemStack() {
-        ItemStack itemStack = new ItemStack(material);
+    public ItemStack createItemStack(int amount) {
+        ItemStack itemStack = new ItemStack(material, amount);
         ItemMeta meta = itemStack.getItemMeta();
         meta.displayName(name);
         var lore = Optional.ofNullable(meta.lore()).orElse(new ArrayList<>());

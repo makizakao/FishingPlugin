@@ -7,6 +7,7 @@ Language:
 # Database connection settings
 # Do not modify values in DatabaseVersion section.
 # Only this plugin is allowed to change this section.
-DatabaseVersion:
+Database:
+  Path: "jdbc:sqlite:plugins/FishingPlugin/fishing_plugin.db"
   PlayersTableVersion: 1
   CountsTableVersion: 1

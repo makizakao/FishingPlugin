@@ -1,12 +1,11 @@
-package org.hark7.fishingPlugin.type;
+package org.hark7.fishingPlugin.type.item;
 
-import io.papermc.paper.datacomponent.DataComponentType;
-import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,13 +14,15 @@ import org.hark7.fishingPlugin.util.CustomLang;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
-public class ItemFish implements MaterialFish {
+public class ItemFish implements Fishable {
+    private final Random rand = new Random();
     private final Component name;
     private final Rarity rarity;
     public final Material material;
     private final int damage;
-    private final EnchantmentLevelPair[] enchantments;
+    private final List<EnchantmentLevelPair> enchantments;
 
     /**
      * 魚のコンストラクタ（名前と素材のみ）
@@ -30,7 +31,7 @@ public class ItemFish implements MaterialFish {
      * @param rarity       レアリティ
      * @param enchantments 付与されるエンチャント
      */
-    public ItemFish(Material material, Rarity rarity, EnchantmentLevelPair... enchantments) {
+    public ItemFish(Material material, Rarity rarity, List<EnchantmentLevelPair> enchantments) {
         this.name = Optional.ofNullable(material.getItemTranslationKey())
                 .map(Component::translatable)
                 .map(c -> (Component) c)
@@ -49,7 +50,7 @@ public class ItemFish implements MaterialFish {
      * @param damage       ダメージ値
      * @param enchantments 付与されるエンチャント
      */
-    public ItemFish(Material material, Rarity rarity, int damage, EnchantmentLevelPair... enchantments) {
+    public ItemFish(Material material, Rarity rarity, int damage, List<EnchantmentLevelPair> enchantments) {
         this.name = Component.translatable(material.translationKey());
         this.material = material;
         this.rarity = rarity;
@@ -57,7 +58,14 @@ public class ItemFish implements MaterialFish {
         this.enchantments = enchantments;
     }
 
-    public ItemStack createItemStack() {
+    @Override
+    public void onFish(PlayerFishEvent event) {
+        if (event.getCaught() instanceof Item caughtItem) {
+            caughtItem.setItemStack(createItemStack());
+        }
+    }
+
+    private ItemStack createItemStack() {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta meta = itemStack.getItemMeta();
         var lore = Optional.ofNullable(meta.lore()).orElse(new ArrayList<>());
@@ -86,11 +94,6 @@ public class ItemFish implements MaterialFish {
     @Override
     public Rarity rarity() {
         return rarity;
-    }
-
-    @Override
-    public Material material() {
-        return material;
     }
 
     @Override

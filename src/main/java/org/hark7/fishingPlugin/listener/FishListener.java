@@ -2,6 +2,7 @@ package org.hark7.fishingPlugin.listener;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -10,10 +11,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
-import org.hark7.fishingPlugin.database.FishExpManager;
-import org.hark7.fishingPlugin.type.*;
+import org.hark7.fishingPlugin.manager.FishLevelManager;
+import org.hark7.fishingPlugin.database.PlayerDataController;
 import org.hark7.fishingPlugin.FishingPlugin;
-import org.hark7.fishingPlugin.type.Fishable.*;
+import org.hark7.fishingPlugin.type.item.EntityFish;
+import org.hark7.fishingPlugin.type.item.Fishable;
+import org.hark7.fishingPlugin.type.item.Fishable.*;
+import org.hark7.fishingPlugin.type.item.ItemFish;
+import org.hark7.fishingPlugin.type.item.MaterialFish;
 
 import java.util.*;
 
@@ -42,11 +47,13 @@ public class FishListener implements Listener {
             Enchantment.UNBREAKING
     };
     private final FishingPlugin plugin;
-    private final FishExpManager manager;
+    private final FishLevelManager levelManager;
+    private final PlayerDataController saveManager;
 
-    public FishListener(FishingPlugin plugin, FishExpManager manager) {
+    public FishListener(FishingPlugin plugin, FishLevelManager levelManager, PlayerDataController saveManager) {
         this.plugin = plugin;
-        this.manager = manager;
+        this.levelManager = levelManager;
+        this.saveManager = saveManager;
     }
 
     /**
@@ -61,39 +68,48 @@ public class FishListener implements Listener {
         if (event.getState() == PlayerFishEvent.State.CAUGHT_FISH) {
             Player player = event.getPlayer();
             UUID playerUUID = player.getUniqueId();
-            Fishable caughtFish = getRandomFish(playerUUID, player.getInventory().getItemInMainHand());
-            if (caughtFish == null) return;
-            event.setExpToDrop(caughtFish.rarity().playerExp());
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                Fishable caughtFish = getRandomFish(playerUUID, player.getInventory().getItemInMainHand());
+                if (caughtFish == null) return;
+                event.setExpToDrop(caughtFish.rarity().playerExp());
 
-            if (caughtFish instanceof MaterialFish customFish) {
-                if (event.getCaught() instanceof Item caughtItem) {
-                    caughtItem.setItemStack(customFish.createItemStack());
-                }
-            } else if (caughtFish instanceof EntityFish entityFish) {
-                var location = event.getHook().getLocation();
-                var world = event.getHook().getWorld();
-                world.spawnEntity(location, entityFish.entityType());
-                if (event.getCaught() != null) event.getCaught().remove();
-            } else return;
+                if (caughtFish instanceof MaterialFish customFish) {
+                    if (event.getCaught() instanceof Item caughtItem) {
+                        caughtItem.setItemStack(customFish.createItemStack(1));
+                    }
+                } else if (caughtFish instanceof EntityFish entityFish) {
+                    var location = event.getHook().getLocation();
+                    var world = event.getHook().getWorld();
+                    world.spawnEntity(location, entityFish.entityType());
+                    if (event.getCaught() != null) event.getCaught().remove();
+                } else return;
 
-            int baseExp = caughtFish.rarity().exp();
-            int bonusExp = calculateBonusExp(player.getInventory().getItemInMainHand());
-            int totalExp = baseExp + bonusExp;
-            manager.addExperience(player, totalExp);
-            plugin.addCount(playerUUID, caughtFish.rarity());
+                int baseExp = caughtFish.rarity().exp();
+                int bonusExp = calculateBonusExp(player.getInventory().getItemInMainHand());
+                int totalExp = baseExp + bonusExp;
 
-            player.sendMessage(Component
-                    .text("あなたは ")
-                    .append(caughtFish.name().color(caughtFish.rarity().textColor()))
-                    .append(Component.text(" を釣りあげました！")));
-            player.sendMessage(Component
-                    .text("経験値を獲得しました: ")
-                    .append(Component.text(totalExp))
-                    .append(Component.text(" (ボーナス: "))
-                    .append(Component.text(bonusExp))
-                    .append(Component.text(")"))
-                    .color(NamedTextColor.YELLOW));
+                player.sendMessage(Component
+                        .text("あなたは ")
+                        .append(caughtFish.name().color(caughtFish.rarity().textColor()))
+                        .append(Component.text(" を釣りあげました！")));
+                player.sendMessage(Component
+                        .text("経験値を獲得しました: ")
+                        .append(Component.text(totalExp))
+                        .append(Component.text(" (ボーナス: "))
+                        .append(Component.text(bonusExp))
+                        .append(Component.text(")"))
+                        .color(NamedTextColor.YELLOW));
+                levelManager.addExperience(player, totalExp);
+                addCount(playerUUID, caughtFish.rarity());
+            });
         }
+    }
+
+    public void addCount(UUID playerUUID, Fishable.Rarity rarity) {
+        var playerData = saveManager.playerDataMap().get(playerUUID);
+        int currentCount = playerData.count(rarity) + 1;
+
+        saveManager.savePlayerCount(playerUUID, rarity, currentCount);
     }
 
     /**
@@ -133,7 +149,7 @@ public class FishListener implements Listener {
      * @return ランダムに選ばれた魚
      */
     private Fishable getRandomFish(UUID playerUUID, ItemStack fishingRod) {
-        int playerLevel = plugin.playerDataMap().get(playerUUID).level();
+        int playerLevel = saveManager.playerDataMap().get(playerUUID).level();
         double rarityBonus = calculateRarityBonus(playerLevel, fishingRod);
         double random = Math.random();
         Rarity selectedRarity = getRarity(random, rarityBonus);

@@ -1,17 +1,17 @@
-package org.hark7.fishingPlugin.type;
+package org.hark7.fishingPlugin.type.item;
 
+import com.google.common.base.CaseFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.event.player.PlayerFishEvent;
 
 public interface Fishable {
     Component name();
-
     FishType fishType();
-
     Rarity rarity();
+    void onFish(PlayerFishEvent event);
 
     enum FishType {
         Fish,
@@ -47,6 +47,10 @@ public interface Fishable {
 
         public TextColor textColor() {
             return textColor;
+        }
+
+        public String key() {
+            return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, this.name());
         }
     }
 

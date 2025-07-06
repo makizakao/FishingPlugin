@@ -4,11 +4,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
-import org.hark7.fishingPlugin.type.CustomFish;
-import org.hark7.fishingPlugin.type.EntityFish;
-import org.hark7.fishingPlugin.type.Fishable;
-import org.hark7.fishingPlugin.type.Fishable.*;
-import org.hark7.fishingPlugin.type.ItemFish;
+import org.hark7.fishingPlugin.type.item.CustomFish;
+import org.hark7.fishingPlugin.type.item.EntityFish;
+import org.hark7.fishingPlugin.type.item.Fishable;
+import org.hark7.fishingPlugin.type.item.Fishable.*;
+import org.hark7.fishingPlugin.type.item.ItemFish;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.hark7.fishingPlugin.type;
+package org.hark7.fishingPlugin.type.item;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.EntityType;

@@ -4,8 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.hark7.fishingPlugin.commands.handler.ICommandHandler;
 import org.hark7.fishingPlugin.database.PlayerData;
-import org.hark7.fishingPlugin.database.PlayerDataManager;
-import org.hark7.fishingPlugin.type.Fishable.Rarity;
+import org.hark7.fishingPlugin.database.PlayerDataController;
+import org.hark7.fishingPlugin.type.item.Fishable.Rarity;
 import org.hark7.fishingPlugin.util.CustomLang;
 
 import java.util.ArrayList;
@@ -13,10 +13,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * コマンドハンドラー: top common
+ * <p>
+ * プレイヤーの「COMMON」レアリティの魚の数をランキング形式で表示するコマンドを処理します。
+ */
 public class TopCommonCommand implements ICommandHandler {
-    private final PlayerDataManager manager;
+    private final PlayerDataController manager;
 
-    public TopCommonCommand(PlayerDataManager manager) {
+    /**
+     * コンストラクタ
+     *
+     * @param manager PlayerDataManagerのインスタンス
+     * @throws IllegalArgumentException 引数がnullの場合にスローされます。
+     */
+    public TopCommonCommand(PlayerDataController manager) {
+        if (manager == null) throw new IllegalArgumentException("PlayerDataManager cannot be null");
         this.manager = manager;
     }
 
@@ -38,6 +50,12 @@ public class TopCommonCommand implements ICommandHandler {
         sendRank(player, sortedList);
     }
 
+    /**
+     * ランキングをプレイヤーに送信します。
+     *
+     * @param sender     ランキングを受け取るプレイヤー
+     * @param sortedList ランキングデータのリスト
+     */
     private void sendRank(Player sender, List<Map.Entry<UUID, Integer>> sortedList) {
         var lang = sender.locale().toLanguageTag();
         var title = CustomLang.of("Commands.top.common.Title", lang);

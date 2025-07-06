@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hark7.fishingPlugin.type.Fishable.*;
+import org.hark7.fishingPlugin.type.item.Fishable.*;
 
 public class PlayerData {
     private final String playerName; // プレイヤー名

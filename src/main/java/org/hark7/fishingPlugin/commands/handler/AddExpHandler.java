@@ -2,15 +2,29 @@ package org.hark7.fishingPlugin.commands.handler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.hark7.fishingPlugin.database.FishExpManager;
+import org.hark7.fishingPlugin.manager.FishLevelManager;
 import org.hark7.fishingPlugin.util.CustomLang;
 
 import java.util.List;
 
+/**
+ * コマンドハンドラー: addexp
+ * <p>
+ * プレイヤーに経験値を追加するコマンドを処理します。
+ * 使用権限はオペレーターのみです。
+ */
 public class AddExpHandler implements ICommandHandler {
-    private final FishExpManager manager;
+    private final FishLevelManager manager;
 
-    public AddExpHandler(FishExpManager manager) {
+    /**
+     * コンストラクタ
+     *
+     * @param manager FishExpManagerのインスタンス
+     * @throws IllegalArgumentException 引数がnullの場合にスローされます。
+     */
+    public AddExpHandler(FishLevelManager manager) {
+        // 引数のチェック
+        if (manager == null) throw new IllegalArgumentException("FishExpManager cannot be null");
         this.manager = manager;
     }
 
