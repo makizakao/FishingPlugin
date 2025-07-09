@@ -3,15 +3,15 @@ package org.hark7.fishingPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
-import org.hark7.fishingPlugin.type.item.CustomFish;
-import org.hark7.fishingPlugin.type.item.EntityFish;
-import org.hark7.fishingPlugin.type.item.Fishable;
+import org.hark7.fishingPlugin.type.item.*;
 import org.hark7.fishingPlugin.type.item.Fishable.*;
-import org.hark7.fishingPlugin.type.item.ItemFish;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FishTable {
     private final List<Fishable> fishList = new ArrayList<>();       // 釣り可能な魚のリスト
@@ -106,13 +106,68 @@ public class FishTable {
         // Legendary fish (8 types)
         addFish("幻の金色コイ", "伝説の魚", Material.COD, Rarity.LEGENDARY);
         addFish("深海の巨大イカ", "伝説の海獣", Material.COD, Rarity.LEGENDARY);
-        addItem(Material.FISHING_ROD, Rarity.LEGENDARY);
-        addItem(Material.NAME_TAG, Rarity.LEGENDARY);
-        addItem(Material.ENCHANTED_BOOK, Rarity.LEGENDARY);
-        addItem(Material.BOW, Rarity.LEGENDARY);
-        addItem(Material.ENCHANTED_BOOK, Rarity.LEGENDARY);
         addItem(Material.NAUTILUS_SHELL, Rarity.LEGENDARY);
         addItem(Material.SADDLE, Rarity.LEGENDARY);
+        addItem(Material.NAME_TAG, Rarity.LEGENDARY);
+        addTool(Material.FISHING_ROD, Rarity.LEGENDARY, 60,
+                List.of(
+                        EnchantmentGroup.builder().enchantment(Enchantment.UNBREAKING)
+                                .minFishLevel(3).maxEnchantLevel(3).increment(3).chance(0.25f).build(),
+                        EnchantmentGroup.builder().enchantment(Enchantment.LURE)
+                                .minFishLevel(7).maxEnchantLevel(3).increment(4).chance(0.25f).build(),
+                        EnchantmentGroup.builder().enchantment(Enchantment.LUCK_OF_THE_SEA)
+                                .minFishLevel(10).maxEnchantLevel(3).increment(3).chance(0.25f).build()
+                ), List.of(
+                        DurabilityGroup.builder().minLevel(3).minRepair(1).maxRepair(10).build(),
+                        DurabilityGroup.builder().minLevel(5).minRepair(2).maxRepair(10).build(),
+                        DurabilityGroup.builder().minLevel(7).minRepair(2).maxRepair(10).build(),
+                        DurabilityGroup.builder().minLevel(10).minRepair(3).maxRepair(10).build(),
+                        DurabilityGroup.builder().minLevel(12).minRepair(3).maxRepair(10).build(),
+                        DurabilityGroup.builder().minLevel(15).minRepair(1).maxRepair(10).build(),
+                        DurabilityGroup.builder().minLevel(18).minRepair(1).maxRepair(10).build(),
+                        DurabilityGroup.builder().minLevel(20).minRepair(1).maxRepair(10).build()
+                ));
+        addTool(Material.BOW, Rarity.LEGENDARY, 350,
+                List.of(
+                        EnchantmentGroup.builder().enchantment(Enchantment.UNBREAKING)
+                                .minFishLevel(3).maxEnchantLevel(3).increment(3).chance(0.25f).build(),
+                        EnchantmentGroup.builder().enchantment(Enchantment.PUNCH)
+                                .minFishLevel(5).maxEnchantLevel(2).increment(5).chance(0.25f).build(),
+                        EnchantmentGroup.builder().enchantment(Enchantment.POWER)
+                                .minFishLevel(5).maxEnchantLevel(5).increment(3).chance(0.25f).build(),
+                        EnchantmentGroup.builder().enchantment(Enchantment.FLAME)
+                                .minFishLevel(15).maxEnchantLevel(1).chance(0.25f).build(),
+                        EnchantmentGroup.builder().enchantment(Enchantment.INFINITY)
+                                .minFishLevel(20).maxEnchantLevel(1).chance(0.25f).build()
+                ), List.of(
+                        DurabilityGroup.builder().minLevel(3).minRepair(5).maxRepair(30).build(),
+                        DurabilityGroup.builder().minLevel(5).minRepair(5).maxRepair(30).build(),
+                        DurabilityGroup.builder().minLevel(7).minRepair(5).maxRepair(30).build(),
+                        DurabilityGroup.builder().minLevel(10).minRepair(10).maxRepair(30).build(),
+                        DurabilityGroup.builder().minLevel(12).minRepair(10).maxRepair(30).build(),
+                        DurabilityGroup.builder().minLevel(15).minRepair(5).maxRepair(40).build(),
+                        DurabilityGroup.builder().minLevel(18).minRepair(5).maxRepair(40).build(),
+                        DurabilityGroup.builder().minLevel(20).minRepair(5).maxRepair(50).build()
+                ));
+        List<EnchantmentGroup> enchantments = Stream.of(
+                Enchantment.BINDING_CURSE, Enchantment.VANISHING_CURSE, Enchantment.FROST_WALKER, Enchantment.MENDING,
+                Enchantment.SOUL_SPEED, Enchantment.SWIFT_SNEAK, Enchantment.WIND_BURST, Enchantment.AQUA_AFFINITY,
+                Enchantment.BANE_OF_ARTHROPODS, Enchantment.BLAST_PROTECTION, Enchantment.BREACH,
+                Enchantment.CHANNELING, Enchantment.DEPTH_STRIDER, Enchantment.DENSITY, Enchantment.EFFICIENCY,
+                Enchantment.FEATHER_FALLING, Enchantment.FIRE_ASPECT, Enchantment.FIRE_PROTECTION, Enchantment.FLAME,
+                Enchantment.FORTUNE, Enchantment.IMPALING, Enchantment.INFINITY, Enchantment.KNOCKBACK,
+                Enchantment.LOOTING, Enchantment.LOYALTY, Enchantment.LUCK_OF_THE_SEA, Enchantment.LURE,
+                Enchantment.MULTISHOT, Enchantment.PIERCING, Enchantment.POWER, Enchantment.PROJECTILE_PROTECTION,
+                Enchantment.PROTECTION, Enchantment.PUNCH, Enchantment.QUICK_CHARGE, Enchantment.RESPIRATION,
+                Enchantment.RIPTIDE, Enchantment.SHARPNESS, Enchantment.SILK_TOUCH, Enchantment.SMITE,
+                Enchantment.SWEEPING_EDGE, Enchantment.THORNS, Enchantment.UNBREAKING
+        ).map(e -> {
+            var maxLevel = e.getMaxLevel();
+            var increment = 2 < maxLevel ? 10 : 5;
+            return EnchantmentGroup.builder().enchantment(e)
+                    .minFishLevel(1).maxEnchantLevel(maxLevel).increment(increment).chance(0.5f).build();
+        }).collect(Collectors.toUnmodifiableList());
+        addItem(Material.ENCHANTED_BOOK, Rarity.LEGENDARY, enchantments);
     }
 
     public List<Fishable> fishList() {
@@ -120,14 +175,49 @@ public class FishTable {
     }
 
     private void addFish(String name, String description, Material material, Rarity rarity) {
-        fishList.add(new CustomFish(name, material, Component.text(description).color(NamedTextColor.GRAY), rarity));
+        fishList.add(ItemFish.builder()
+                .name(Component.text(name))
+                .material(material)
+                .description(Component.text(description).color(NamedTextColor.GRAY))
+                .fishType(FishType.Fish)
+                .rarity(rarity).build());
     }
 
     private void addItem(Material material, Rarity rarity) {
-        fishList.add(new ItemFish(material, rarity));
+        fishList.add(ItemFish.builder()
+                .material(material)
+                .nameFromMaterial()
+                .fishType(FishType.Item)
+                .rarity(rarity).build());
+    }
+
+    private void addItem(Material material, Rarity rarity, List<EnchantmentGroup> enchantments) {
+        fishList.add(ItemFish.builder()
+                .material(material)
+                .nameFromMaterial()
+                .rarity(rarity)
+                .enchantments(enchantments)
+                .fishType(FishType.Item)
+                .build());
+    }
+
+    private void addTool(Material material, Rarity rarity, int damage,
+                         List<EnchantmentGroup> enchantments, List<DurabilityGroup> durabilityGroups) {
+        fishList.add(ToolFish.builder()
+                .material(material)
+                .nameFromMaterial()
+                .rarity(rarity)
+                .damage(damage)
+                .enchantments(enchantments)
+                .durabilityGroups(durabilityGroups)
+                .fishType(FishType.Item)
+                .build());
     }
 
     private void addEntity(EntityType entity, Rarity rarity) {
-        fishList.add(new EntityFish(entity, rarity));
+        fishList.add(EntityFish.builder()
+                .entity(entity)
+                .nameFromEntity()
+                .rarity(rarity).build());
     }
 }

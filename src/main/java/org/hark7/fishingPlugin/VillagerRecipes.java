@@ -4,8 +4,8 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.hark7.fishingPlugin.manager.VillagerRecipeManager;
-import org.hark7.fishingPlugin.type.item.CustomFish;
 import org.hark7.fishingPlugin.type.item.Fishable;
+import org.hark7.fishingPlugin.type.item.ItemFish;
 import org.hark7.fishingPlugin.type.recipe.MerchantItemRecipe;
 import org.hark7.fishingPlugin.type.recipe.MerchantToolRecipe;
 
@@ -87,8 +87,9 @@ public class VillagerRecipes {
                 .build().itemRecipe());
         fishList.stream()
                 .filter(i -> i.rarity() == Fishable.Rarity.RARE)
-                .filter(i -> i instanceof CustomFish)
-                .map(i -> (CustomFish) i)
+                .filter(i -> i.fishType() == Fishable.FishType.Fish)
+                .filter(i -> i instanceof ItemFish)
+                .map(i -> (ItemFish) i)
                 .forEach(fish -> {
                     var itemStack = fish.createItemStack(5);
                     manager.addRecipe(VillagerRecipeManager.VillagerLevel.APPRENTICE, MerchantItemRecipe.RecipeBuilder.builder()
@@ -122,8 +123,9 @@ public class VillagerRecipes {
                 .build().toolRecipe());
         fishList.stream()
                 .filter(i -> i.rarity() == Fishable.Rarity.EPIC)
-                .filter(i -> i instanceof CustomFish)
-                .map(i -> (CustomFish) i)
+                .filter(i -> i.fishType() == Fishable.FishType.Fish)
+                .filter(i -> i instanceof ItemFish)
+                .map(i -> (ItemFish) i)
                 .forEach(fish -> {
                     var itemStack = fish.createItemStack(1);
                     manager.addRecipe(VillagerRecipeManager.VillagerLevel.JOURNEYMAN, MerchantItemRecipe.RecipeBuilder.builder()
@@ -158,8 +160,9 @@ public class VillagerRecipes {
                 .ingredients(List.of(new ItemStack(Material.PUFFERFISH, 4)))
                 .build().itemRecipe());
         fishList.stream().filter(i -> i.rarity() == Fishable.Rarity.LEGENDARY)
-                .filter(e -> e instanceof CustomFish)
-                .map(i -> (CustomFish) i)
+                .filter(i -> i.fishType() == Fishable.FishType.Fish)
+                .filter(i -> i instanceof ItemFish)
+                .map(i -> (ItemFish) i)
                 .forEach(fish -> {
                     var itemStack = fish.createItemStack(1);
                     manager.addRecipe(VillagerRecipeManager.VillagerLevel.MASTER, MerchantItemRecipe.RecipeBuilder.builder()

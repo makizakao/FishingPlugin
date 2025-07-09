@@ -37,26 +37,34 @@ public class FishLevelManager {
      * @param exp    追加する経験値
      */
     public void addExperience(Player player, int exp) {
-        var playerUUID = player.getUniqueId();
-        var playerData = manager.playerDataMap().get(playerUUID);
-        var lang = player.locale().toLanguageTag();
-        int currentExp = playerData.exp() + exp;
-        int currentLevel = playerData.level();
-
-        while (currentExp >= getRequiredExp(currentLevel)) {
-            currentExp -= getRequiredExp(currentLevel);
-            currentLevel++;
-
-            CustomLang.ofSimpleComponent("FishingLevel.LevelUp", lang)
-                    .replace("{level}", String.valueOf(currentLevel))
-                    .send(player);
-        }
-        final int finalCurrentExp = currentExp;
-        final int finalCurrentLevel = currentLevel;
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            var playerUUID = player.getUniqueId();
+            var playerData = manager.playerDataMap().get(playerUUID);
+            var lang = player.locale().toLanguageTag();
+            int currentExp = playerData.exp() + exp;
+            int currentLevel = playerData.level();
+
+            while (currentExp >= getRequiredExp(currentLevel)) {
+                currentExp -= getRequiredExp(currentLevel);
+                currentLevel++;
+
+                CustomLang.ofSimpleComponent("FishingLevel.LevelUp", lang)
+                        .replace("{level}", String.valueOf(currentLevel))
+                        .send(player);
+            }
+            final int finalCurrentExp = currentExp;
+            final int finalCurrentLevel = currentLevel;
             manager.savePlayerExp(playerUUID, finalCurrentExp);
             manager.savePlayerLevel(playerUUID, finalCurrentLevel);
         });
+    }
+
+    public int getPlayerLevel(Player player) {
+        return manager.getPlayerData(player.getUniqueId()).level();
+    }
+
+    public int getPlayerExp(Player player) {
+        return manager.getPlayerData(player.getUniqueId()).exp();
     }
 
     /**

@@ -1,24 +1,23 @@
 package org.hark7.fishingPlugin.listener;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
+import org.hark7.fishingPlugin.FishTable;
 import org.hark7.fishingPlugin.manager.FishLevelManager;
 import org.hark7.fishingPlugin.database.PlayerDataController;
 import org.hark7.fishingPlugin.FishingPlugin;
-import org.hark7.fishingPlugin.type.item.EntityFish;
 import org.hark7.fishingPlugin.type.item.Fishable;
 import org.hark7.fishingPlugin.type.item.Fishable.*;
-import org.hark7.fishingPlugin.type.item.ItemFish;
-import org.hark7.fishingPlugin.type.item.MaterialFish;
+import org.hark7.fishingPlugin.util.CustomLang;
 
 import java.util.*;
 
@@ -32,28 +31,17 @@ public class FishListener implements Listener {
     private static final float BASE_RARE_CHANCE = 0.05F;       // 基本のレア魚の出現確率
     private static final float BASE_UNCOMMON_CHANCE = 0.2F;    // 基本のアンコモン魚の出現確率
     private static final float BASE_COMMON_CHANCE = 0.8F;      // 基本のコモン魚の出現確率
-    // エンチャント本に含まれる可能性のあるエンチャントのリスト
-    private final Enchantment[] enchantments = {
-            Enchantment.BINDING_CURSE, Enchantment.VANISHING_CURSE, Enchantment.FROST_WALKER, Enchantment.MENDING,
-            Enchantment.SOUL_SPEED, Enchantment.SWIFT_SNEAK, Enchantment.WIND_BURST, Enchantment.AQUA_AFFINITY,
-            Enchantment.BANE_OF_ARTHROPODS, Enchantment.BLAST_PROTECTION, Enchantment.BREACH, Enchantment.CHANNELING,
-            Enchantment.DEPTH_STRIDER, Enchantment.DENSITY, Enchantment.EFFICIENCY, Enchantment.FEATHER_FALLING,
-            Enchantment.FIRE_ASPECT, Enchantment.FIRE_PROTECTION, Enchantment.FLAME, Enchantment.FORTUNE,
-            Enchantment.IMPALING, Enchantment.INFINITY, Enchantment.KNOCKBACK, Enchantment.LOOTING, Enchantment.LOYALTY,
-            Enchantment.LUCK_OF_THE_SEA, Enchantment.LURE, Enchantment.MULTISHOT, Enchantment.PIERCING,
-            Enchantment.POWER, Enchantment.PROJECTILE_PROTECTION, Enchantment.PROTECTION, Enchantment.PUNCH,
-            Enchantment.QUICK_CHARGE, Enchantment.RESPIRATION, Enchantment.RIPTIDE, Enchantment.SHARPNESS,
-            Enchantment.SILK_TOUCH, Enchantment.SMITE, Enchantment.SWEEPING_EDGE, Enchantment.THORNS,
-            Enchantment.UNBREAKING
-    };
     private final FishingPlugin plugin;
     private final FishLevelManager levelManager;
     private final PlayerDataController saveManager;
+    private final FishTable fishTable;
 
-    public FishListener(FishingPlugin plugin, FishLevelManager levelManager, PlayerDataController saveManager) {
+    public FishListener(FishingPlugin plugin, FishLevelManager levelManager, PlayerDataController saveManager,
+                        FishTable fishTable) {
         this.plugin = plugin;
         this.levelManager = levelManager;
         this.saveManager = saveManager;
+        this.fishTable = fishTable;
     }
 
     /**
@@ -72,33 +60,20 @@ public class FishListener implements Listener {
                 Fishable caughtFish = getRandomFish(playerUUID, player.getInventory().getItemInMainHand());
                 if (caughtFish == null) return;
                 event.setExpToDrop(caughtFish.rarity().playerExp());
-
-                if (caughtFish instanceof MaterialFish customFish) {
-                    if (event.getCaught() instanceof Item caughtItem) {
-                        caughtItem.setItemStack(customFish.createItemStack(1));
-                    }
-                } else if (caughtFish instanceof EntityFish entityFish) {
-                    var location = event.getHook().getLocation();
-                    var world = event.getHook().getWorld();
-                    world.spawnEntity(location, entityFish.entityType());
-                    if (event.getCaught() != null) event.getCaught().remove();
-                } else return;
+                caughtFish.onFish(event, levelManager, plugin);
 
                 int baseExp = caughtFish.rarity().exp();
                 int bonusExp = calculateBonusExp(player.getInventory().getItemInMainHand());
                 int totalExp = baseExp + bonusExp;
-
-                player.sendMessage(Component
-                        .text("あなたは ")
-                        .append(caughtFish.name().color(caughtFish.rarity().textColor()))
-                        .append(Component.text(" を釣りあげました！")));
-                player.sendMessage(Component
-                        .text("経験値を獲得しました: ")
-                        .append(Component.text(totalExp))
-                        .append(Component.text(" (ボーナス: "))
-                        .append(Component.text(bonusExp))
-                        .append(Component.text(")"))
-                        .color(NamedTextColor.YELLOW));
+                player.sendMessage(CustomLang.ofComponent("Fishing.OnFish")
+                        .replaceText(TextReplacementConfig.builder()
+                                .matchLiteral("{fish}")
+                                .replacement(caughtFish.name().color(caughtFish.rarity().color()))
+                                .build()));
+                CustomLang.ofSimpleComponent("Fishing.OmGetExp")
+                        .replace("{exp}", totalExp)
+                        .replace("{bonus}", bonusExp)
+                        .send(player);
                 levelManager.addExperience(player, totalExp);
                 addCount(playerUUID, caughtFish.rarity());
             });
@@ -154,20 +129,10 @@ public class FishListener implements Listener {
         double random = Math.random();
         Rarity selectedRarity = getRarity(random, rarityBonus);
 
-        List<Fishable> fishOfSelectedRarity = plugin.fishList().stream()
+        List<Fishable> fishOfSelectedRarity = fishTable.fishList().stream()
                 .filter(fish -> fish.rarity() == selectedRarity)
                 .toList();
-        var selectedFish = fishOfSelectedRarity.get(new Random().nextInt(fishOfSelectedRarity.size()));
-
-        if (selectedFish instanceof ItemFish item) {
-            return switch (item.material) {
-                case BOW -> getBow(playerLevel);
-                case ENCHANTED_BOOK -> getEnchantBook(playerLevel);
-                case FISHING_ROD -> getFishingLod(playerLevel);
-                default -> item;
-            };
-        }
-        return selectedFish;
+        return fishOfSelectedRarity.get(new Random().nextInt(fishOfSelectedRarity.size()));
     }
 
     /**
@@ -187,120 +152,5 @@ public class FishListener implements Listener {
         else if (random < (BASE_COMMON_CHANCE + rarityBonus)) selectedRarity = Rarity.COMMON;
         else selectedRarity = Rarity.SCRAP;
         return selectedRarity;
-    }
-
-    /**
-     * プレイヤーのレベルに応じて弓を生成します。
-     * 耐久力、衝撃、パワー、フレイム、無限、修繕のエンチャントがランダムに付与されます。
-     *
-     * @param playerLevel プレイヤーのレベル
-     * @return 弓
-     */
-    private ItemFish getBow(int playerLevel) {
-        var rand = new Random();
-        var enchantments = new ArrayList<EnchantmentLevelPair>();
-        var damage = 350;
-        // 耐久力のエンチャントを追加
-        if (playerLevel >= 3 && rand.nextInt(4) == 0) {
-            var level = 1;
-            if (playerLevel > 10) level += rand.nextInt(3);
-            else if (playerLevel > 7) level += rand.nextInt(2);
-            enchantments.add(new EnchantmentLevelPair(Enchantment.UNBREAKING, level));
-        }
-        // 衝撃のエンチャントを追加
-        if (playerLevel >= 5 && rand.nextInt(4) == 0) {
-            var level = 1;
-            if (playerLevel > 10) level += rand.nextInt(2);
-            enchantments.add(new EnchantmentLevelPair(Enchantment.PUNCH, level));
-        }
-        // パワーのエンチャントを追加
-        if (playerLevel >= 5 && rand.nextInt(4) == 0) {
-            var level = 1;
-            if (playerLevel > 18) level += rand.nextInt(5);
-            else if (playerLevel > 15) level += rand.nextInt(4);
-            else if (playerLevel > 12) level += rand.nextInt(3);
-            else if (playerLevel > 10) level += rand.nextInt(2);
-            enchantments.add(new EnchantmentLevelPair(Enchantment.POWER, level));
-        }
-        // フレイムのエンチャントを追加
-        if (playerLevel >= 15 && rand.nextInt(4) == 0) {
-            enchantments.add(new EnchantmentLevelPair(Enchantment.FLAME, 1));
-        }
-        // 無限のエンチャントを追加
-        if (playerLevel >= 18 && rand.nextInt(4) == 0) {
-            enchantments.add(new EnchantmentLevelPair(Enchantment.INFINITY, 1));
-        }
-        // 耐久値を設定
-        if (playerLevel >= 3) damage = Math.max(0, damage - rand.nextInt(30));
-        if (playerLevel >= 5) damage = Math.max(0, damage - rand.nextInt(30));
-        if (playerLevel >= 7) damage = Math.max(0, damage - rand.nextInt(30));
-        if (playerLevel >= 10) damage = Math.max(0, damage - rand.nextInt(30));
-        if (playerLevel >= 12) damage = Math.max(0, damage - rand.nextInt(30));
-        if (playerLevel >= 15) damage = Math.max(0, damage - rand.nextInt(40));
-        if (playerLevel >= 18) damage = Math.max(0, damage - rand.nextInt(40));
-        if (playerLevel >= 20) damage = Math.max(0, damage - rand.nextInt(50));
-        return new ItemFish(Material.BOW, Rarity.LEGENDARY, damage, enchantments.toArray(new EnchantmentLevelPair[0]));
-    }
-
-    /**
-     * プレイヤーのレベルに応じて釣り竿を生成します。
-     * 耐久力、入れ食い、宝釣りのエンチャントがランダムに付与されます。
-     *
-     * @param playerLevel 　プレイヤーのレベル
-     *                    return 釣り竿
-     */
-    private ItemFish getFishingLod(int playerLevel) {
-        var rand = new Random();
-        var enchantments = new ArrayList<EnchantmentLevelPair>();
-        var damage = 60;
-        // 耐久力のエンチャントを追加
-        if (playerLevel >= 3 && rand.nextInt(4) == 0) {
-            var level = 1;
-            if (playerLevel > 10) level += rand.nextInt(3);
-            else if (playerLevel > 7) level += rand.nextInt(2);
-            enchantments.add(new EnchantmentLevelPair(Enchantment.UNBREAKING, level));
-        }
-        // 入れ食いのエンチャントを追加
-        if (playerLevel >= 7 && rand.nextInt(4) == 0) {
-            var level = 1;
-            if (playerLevel > 12) level += rand.nextInt(3);
-            else if (playerLevel > 10) level += rand.nextInt(2);
-            enchantments.add(new EnchantmentLevelPair(Enchantment.LURE, level));
-        }
-        // 宝釣りのエンチャントを追加
-        if (playerLevel >= 10 && rand.nextInt(4) == 0) {
-            var level = 1;
-            if (playerLevel > 15) level += rand.nextInt(3);
-            else if (playerLevel > 12) level += rand.nextInt(2);
-            enchantments.add(new EnchantmentLevelPair(Enchantment.LUCK_OF_THE_SEA, level));
-        }
-        // 耐久値を設定
-        if (playerLevel >= 3) damage = Math.max(0, damage - rand.nextInt(10));
-        if (playerLevel >= 5) damage = Math.max(0, damage - rand.nextInt(10));
-        if (playerLevel >= 7) damage = Math.max(0, damage - rand.nextInt(10));
-        if (playerLevel >= 10) damage = Math.max(0, damage - rand.nextInt(10));
-        if (playerLevel >= 12) damage = Math.max(0, damage - rand.nextInt(10));
-        if (playerLevel >= 15) damage = Math.max(0, damage - rand.nextInt(10));
-        if (playerLevel >= 18) damage = Math.max(0, damage - rand.nextInt(10));
-        if (playerLevel >= 20) damage = Math.max(0, damage - rand.nextInt(10));
-        return new ItemFish(Material.BOW, Rarity.LEGENDARY, damage, enchantments.toArray(new EnchantmentLevelPair[0]));
-    }
-
-    /**
-     * プレイヤーのレベルに応じてエンチャントされた本を生成します。
-     * エンチャントの種類とレベルはランダムに決定されます。
-     *
-     * @param playerLevel プレイヤーのレベル
-     * @return エンチャントされた本
-     */
-    private ItemFish getEnchantBook(int playerLevel) {
-        var rand = new Random();
-        var enchantment = enchantments[rand.nextInt(enchantments.length)];
-        var level = 1;
-        if (2 < enchantment.getMaxLevel())
-            level += rand.nextInt(Math.min(enchantment.getMaxLevel(), playerLevel / 5) + 1);
-        else level += rand.nextInt(Math.min(enchantment.getMaxLevel(), playerLevel / 10) + 1);
-        return new ItemFish(Material.ENCHANTED_BOOK, Rarity.LEGENDARY, 0,
-                new EnchantmentLevelPair(enchantment, level));
     }
 }

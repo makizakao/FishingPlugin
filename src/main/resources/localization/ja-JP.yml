@@ -87,3 +87,7 @@ FishingLevel:
 Items:
   Rarity: "レア度: {rarity}"
 
+Fishing:
+  OnFish: "あなたは{fish}を釣り上げました！"
+  OnGetExp: "§e経験値を獲得しました: {exp} (ボーナス: {bonus})"
+

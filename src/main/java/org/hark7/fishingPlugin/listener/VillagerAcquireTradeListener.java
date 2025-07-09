@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.hark7.fishingPlugin.FishingPlugin;
 import org.hark7.fishingPlugin.manager.VillagerRecipeManager;
 import org.hark7.fishingPlugin.manager.VillagerRecipeManager.VillagerLevel;
 import org.hark7.fishingPlugin.type.recipe.IMerchantRecipe;
@@ -23,14 +24,17 @@ import java.util.Random;
  */
 public class VillagerAcquireTradeListener implements Listener {
     private final VillagerRecipeManager manager;
+    private final FishingPlugin plugin;
 
     /**
      * レシピテーブルを設定します。
      *
+     * @param plugin  FishingPluginのインスタンス
      * @param manager 村人の取引レシピを管理するマネージャー
      */
-    public VillagerAcquireTradeListener(VillagerRecipeManager manager) {
+    public VillagerAcquireTradeListener(FishingPlugin plugin, VillagerRecipeManager manager) {
         this.manager = manager;
+        this.plugin = plugin;
     }
 
 
@@ -58,6 +62,6 @@ public class VillagerAcquireTradeListener implements Listener {
             if (VillagerRecipeManager.isDuplicate(recipe, newRecipes)) continue;
             newRecipes.add(recipe);
         }
-        Bukkit.getScheduler().runTask(JavaPlugin.getProvidingPlugin(getClass()), () -> villager.setRecipes(newRecipes));
+        Bukkit.getScheduler().runTask(plugin, () -> villager.setRecipes(newRecipes));
     }
 }

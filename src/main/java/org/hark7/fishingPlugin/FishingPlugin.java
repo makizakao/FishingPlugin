@@ -29,8 +29,8 @@ public class FishingPlugin extends SimplePlugin {
         fishTable.initializeFishList();
         CustomLang.init(this, getFile());
         var recipeManager = VillagerRecipes.createRecipeManager(fishTable.fishList());
-        Bukkit.getPluginManager().registerEvents(new FishListener(this, fishExpManager, saveManager), this);
-        Bukkit.getPluginManager().registerEvents(new VillagerAcquireTradeListener(recipeManager), this);
+        Bukkit.getPluginManager().registerEvents(new FishListener(this, fishExpManager, saveManager, fishTable), this);
+        Bukkit.getPluginManager().registerEvents(new VillagerAcquireTradeListener(this, recipeManager), this);
         Bukkit.getPluginManager().registerEvents(new PlayerPreLoginListener(this, saveManager), this);
         Recipes.register(this);
         // コマンドの追加
