@@ -51,11 +51,6 @@ public class TopHandler implements ICommandHandler {
     }
 
     @Override
-    public boolean useOnlyOp() {
-        return false;
-    }
-
-    @Override
     public void execute(Player player, String[] args) {
         if (args.length != 2) {
             CustomLang.ofSimpleComponent("Commands.top.Usage", player.locale().toLanguageTag()).send(player);
@@ -79,6 +74,11 @@ public class TopHandler implements ICommandHandler {
                 return handler.tabComplete(args);
             }
         }
+        return List.of();
+    }
+
+    @Override
+    public List<String> permList() {
         return List.of();
     }
 }

@@ -38,11 +38,6 @@ public class StatsHandler implements ICommandHandler {
     }
 
     @Override
-    public boolean useOnlyOp() {
-        return false;
-    }
-
-    @Override
     public void execute(Player player, String[] args) {
         var playerUUID = player.getUniqueId();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -73,6 +68,11 @@ public class StatsHandler implements ICommandHandler {
         if (args.length == 2) {
             return List.of("all");
         }
+        return List.of();
+    }
+
+    @Override
+    public List<String> permList() {
         return List.of();
     }
 }

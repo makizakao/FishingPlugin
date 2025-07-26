@@ -5,6 +5,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
+import org.hark7.fishingPlugin.type.group.DurabilityGroup;
+import org.hark7.fishingPlugin.type.group.EnchantmentGroup;
 import org.hark7.fishingPlugin.type.item.*;
 import org.hark7.fishingPlugin.type.item.Fishable.*;
 

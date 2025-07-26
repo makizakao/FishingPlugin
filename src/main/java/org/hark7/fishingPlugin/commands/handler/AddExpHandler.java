@@ -29,11 +29,6 @@ public class AddExpHandler implements ICommandHandler {
     }
 
     @Override
-    public boolean useOnlyOp() {
-        return true;
-    }
-
-    @Override
     public void execute(Player sender, String[] args) {
         var lang = sender.locale().toLanguageTag();
         if (!sender.isOp()) {
@@ -76,5 +71,12 @@ public class AddExpHandler implements ICommandHandler {
                 .map(Player::getName)
                 .toList();
         return List.of();
+    }
+
+    @Override
+    public List<String> permList() {
+        return List.of(
+                "fishingplugin.op"
+        );
     }
 }

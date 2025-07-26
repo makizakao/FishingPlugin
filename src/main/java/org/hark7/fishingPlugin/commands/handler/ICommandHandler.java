@@ -11,13 +11,6 @@ import java.util.List;
  */
 public interface ICommandHandler {
     /**
-     * このコマンドがオペレーターのみ使用可能かどうかを返します。
-     *
-     * @return オペレーターのみ使用可能ならtrue、そうでなければfalse
-     */
-    boolean useOnlyOp();
-
-    /**
      * コマンドの実行処理を行います。
      *
      * @param player コマンドを実行するプレイヤー
@@ -32,4 +25,11 @@ public interface ICommandHandler {
      * @return タブ補完候補のリスト
      */
     List<String> tabComplete(String[] args);
+
+    /**
+     * このコマンドに必要な権限のリストを返します。
+     *
+     * @return 権限のリスト
+     */
+    List<String> permList();
 }

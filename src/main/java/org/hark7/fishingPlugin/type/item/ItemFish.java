@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.hark7.fishingPlugin.FishingPlugin;
 import org.hark7.fishingPlugin.manager.FishLevelManager;
+import org.hark7.fishingPlugin.type.group.EnchantmentGroup;
 import org.hark7.fishingPlugin.util.CustomLang;
 
 import java.util.ArrayList;

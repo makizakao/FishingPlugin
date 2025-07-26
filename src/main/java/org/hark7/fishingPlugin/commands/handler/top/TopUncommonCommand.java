@@ -33,11 +33,6 @@ public class TopUncommonCommand implements ICommandHandler {
     }
 
     @Override
-    public boolean useOnlyOp() {
-        return false;
-    }
-
-    @Override
     public void execute(Player player, String[] args) {
         var playerDataList = manager.playerDataMap();
         var sortedList = new ArrayList<Map.Entry<UUID, Integer>>();
@@ -73,6 +68,11 @@ public class TopUncommonCommand implements ICommandHandler {
 
     @Override
     public List<String> tabComplete(String[] args) {
+        return List.of();
+    }
+
+    @Override
+    public List<String> permList() {
         return List.of();
     }
 }

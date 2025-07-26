@@ -37,7 +37,6 @@ public class VillagerAcquireTradeListener implements Listener {
         this.plugin = plugin;
     }
 
-
     @EventHandler
     public void onVillagerAcquireTrade(VillagerAcquireTradeEvent event) {
         // 村人が漁師の取引を獲得した場合の処理

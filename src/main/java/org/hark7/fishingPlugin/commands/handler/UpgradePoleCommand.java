@@ -38,14 +38,9 @@ public class UpgradePoleCommand implements ICommandHandler {
     }
 
     @Override
-    public boolean useOnlyOp() {
-        return false;
-    }
-
-    @Override
     public void execute(Player player, String[] args) {
         ItemStack fishingRod = player.getInventory().getItemInMainHand();
-        var lang = player.locale().toLanguageTag();
+        String lang = player.locale().toLanguageTag();
         if (fishingRod.getType() != Material.FISHING_ROD) {
             player.sendMessage(CustomLang.ofComponent("Commands.Invalid.NoHandItem", lang)
                     .replaceText(TextReplacementConfig.builder()
@@ -91,7 +86,7 @@ public class UpgradePoleCommand implements ICommandHandler {
      * @param fishingRod アップグレードする釣り竿
      */
     private void upgradeFishingRod(ItemStack fishingRod) {
-        ItemMeta meta = fishingRod.getItemMeta();
+        var meta = fishingRod.getItemMeta();
         if (meta == null) return;
 
         if (Math.random() < 0.5) {
@@ -107,6 +102,11 @@ public class UpgradePoleCommand implements ICommandHandler {
 
     @Override
     public List<String> tabComplete(String[] args) {
+        return List.of();
+    }
+
+    @Override
+    public List<String> permList() {
         return List.of();
     }
 }

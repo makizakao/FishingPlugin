@@ -4,6 +4,7 @@ import lombok.experimental.SuperBuilder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.hark7.fishingPlugin.type.group.DurabilityGroup;
 
 import java.util.List;
 

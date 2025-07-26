@@ -34,6 +34,7 @@ public final class FishCommand extends SimpleCommand {
         if (saveManager == null) throw new IllegalArgumentException("PlayerDataManager cannot be null");
         setDescription("FishPlugin Commands");
         setMinArguments(1);
+        setDefaultPermission("");
         this.commandHandlers = createCommandHandlers(plugin, fishLevelManager, saveManager);
     }
 
@@ -79,6 +80,7 @@ public final class FishCommand extends SimpleCommand {
             tell(getMultilineUsageMessage());
             return;
         }
+        handler.permList().forEach(this::checkPerm);
         handler.execute((Player) sender, args);
     }
 
@@ -90,20 +92,15 @@ public final class FishCommand extends SimpleCommand {
      */
     @Override
     protected List<String> tabComplete() {
-        if (sender.isOp()) {
-            // op権限を持つプレイヤーは全てのコマンドを補完候補として表示
-            if (args.length == 1) return completeLastWord(commandHandlers.keySet());
-        } else {
-            // 一般プレイヤーは、op権限を持たないコマンドのみを補完候補として表示
-            if (args.length == 1) return commandHandlers.entrySet().stream()
-                    .filter(entry -> !entry.getValue().useOnlyOp())
-                    .map(HashMap.Entry::getKey)
-                    .toList();
-        }
+        if (args.length == 1) return completeLastWord(commandHandlers.entrySet().stream()
+                .filter(e -> e.getValue().permList().stream()
+                        .anyMatch(perm -> hasPerm(sender, perm)))
+                .map(Map.Entry::getKey)
+                .toList());
         // サブコマンドの引数が2つ以上の場合、対応するハンドラーの補完候補を取得
-        if (1 < args.length) {
+        else if (1 < args.length) {
             var handler = commandHandlers.get(args[0]);
-            if (handler != null) return handler.tabComplete(args);
+            if (handler != null) return completeLastWord(handler.tabComplete(args));
         }
         return List.of();
     }

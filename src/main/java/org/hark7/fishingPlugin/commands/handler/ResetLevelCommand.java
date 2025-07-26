@@ -36,11 +36,6 @@ public class ResetLevelCommand implements ICommandHandler {
     }
 
     @Override
-    public boolean useOnlyOp() {
-        return true;
-    }
-
-    @Override
     public void execute(Player player, String[] args) {
         if (!player.isOp()) {
             CustomLang.ofSimpleComponent("Commands.Invalid.PermissionMessage").send(player);
@@ -92,5 +87,12 @@ public class ResetLevelCommand implements ICommandHandler {
             return list;
         }
         return List.of();
+    }
+
+    @Override
+    public List<String> permList() {
+        return List.of(
+                "fishingplugin.op"
+        );
     }
 }

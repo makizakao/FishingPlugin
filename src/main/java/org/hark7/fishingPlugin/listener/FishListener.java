@@ -80,6 +80,14 @@ public class FishListener implements Listener {
         }
     }
 
+    /**
+     * プレイヤーの釣り回数をカウントします。
+     * <p>
+     * プレイヤーのUUIDと釣り上げた魚のレアリティを使用して、データベースに保存します。
+     *
+     * @param playerUUID プレイヤーのUUID
+     * @param rarity     釣り上げた魚のレアリティ
+     */
     public void addCount(UUID playerUUID, Fishable.Rarity rarity) {
         var playerData = saveManager.playerDataMap().get(playerUUID);
         int currentCount = playerData.count(rarity) + 1;
